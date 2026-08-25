@@ -1,0 +1,10 @@
+# このリポジトリが追跡するのは、公開する HTML のみ。
+# 既定で全て無視し、追跡するものを下に列挙する。
+*
+!.gitignore
+!README.md
+!index.html
+!cursed-cafe-api/
+cursed-cafe-api/*
+!cursed-cafe-api/index.html
+!cursed-cafe-api/static.html

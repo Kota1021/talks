@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>注文が通らないカフェ</title>
+</head>
+<body>
+<title>注文が通らないカフェ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+
+<style>
+:root{
+  --ground:#F1EDE8; --surface:#FBF8F4; --rule:#DED4C8;
+  --ink:#241C16; --dim:#6E6055; --faint:#9C8C7E;
+  --flag:#C0361D; --flag-soft:rgba(192,54,29,.10); --flag-line:rgba(192,54,29,.38);
+  --fix:#2C7355; --amber:#9A6B12;
+  --mono:'IBM Plex Mono','Zen Kaku Gothic New',ui-monospace,monospace;
+  --sans:'Zen Kaku Gothic New',system-ui,sans-serif;
+  --rail:min(30rem,34vw);
+  --dur:.34s;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#17120F; --surface:#1E1814; --rule:#372C25;
+    --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52;
+    --flag:#F2603F; --flag-soft:rgba(242,96,63,.13); --flag-line:rgba(242,96,63,.45);
+    --fix:#5FBE93; --amber:#D9A441;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#17120F; --surface:#1E1814; --rule:#372C25;
+  --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52;
+  --flag:#F2603F; --flag-soft:rgba(242,96,63,.13); --flag-line:rgba(242,96,63,.45);
+  --fix:#5FBE93; --amber:#D9A441;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:var(--sans); -webkit-font-smoothing:antialiased;
+  display:grid; grid-template-rows:auto 1fr auto; cursor:default;
+}
+
+/* ---------- top bar ---------- */
+.top{
+  display:flex; align-items:baseline; justify-content:space-between;
+  padding:1.1rem clamp(1rem,3vw,2.6rem) .9rem;
+  border-bottom:1px solid var(--rule);
+  font-family:var(--mono); font-size:clamp(.72rem,1vw,.9rem);
+  letter-spacing:.14em; text-transform:uppercase;
+  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
+}
+body.open .top,body.open .bottom{padding-right:calc(var(--rail) + clamp(1rem,3vw,2.6rem))}
+.act{color:var(--dim); transition:color var(--dur)}
+.act b{color:var(--ink); font-weight:600; letter-spacing:.1em}
+.count{color:var(--faint); font-variant-numeric:tabular-nums; white-space:nowrap}
+.count b{color:var(--flag); font-weight:600; font-size:1.35em}
+
+/* ---------- stage ---------- */
+.stage{
+  display:grid; place-items:center; overflow:hidden;
+  padding:clamp(1rem,3vh,2.4rem) clamp(1rem,3vw,3rem);
+  padding-right:clamp(1rem,3vw,3rem);
+  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
+}
+body.open .stage{padding-right:calc(var(--rail) + clamp(1rem,3vw,3rem))}
+
+.spec{
+  font-family:var(--mono); font-size:clamp(9px,1.04vw,19px);
+  line-height:1.62; white-space:pre; max-width:100%;
+}
+.ln{
+  display:grid; grid-template-columns:2.4em 1fr auto; align-items:center;
+  border-radius:3px; position:relative;
+}
+.ln code{font:inherit; display:block; padding-right:.6em}
+.gut{
+  font-size:.66em; letter-spacing:.06em; color:var(--faint);
+  text-align:right; padding-right:1.1em; font-variant-numeric:tabular-nums;
+  opacity:.55; user-select:none;
+}
+.ln.hit{background:var(--flag-soft); box-shadow:inset 2px 0 0 var(--flag)}
+.ln.hit .gut{opacity:1; color:var(--flag); font-weight:600}
+
+/* the token box — the red pen */
+.tok{border-radius:2px; padding:.04em .1em; transition:background var(--dur),box-shadow var(--dur)}
+.ln.hit .tok.on{
+  box-shadow:0 0 0 1.5px var(--flag); background:var(--flag-soft);
+}
+
+/* ghost rows: the things that are NOT there */
+.ln.ghost{
+  height:0; opacity:0; overflow:hidden;
+  transition:height var(--dur) cubic-bezier(.4,0,.2,1),opacity var(--dur);
+}
+.ln.ghost.show{height:1.62em; opacity:1}
+.ln.ghost code{
+  color:var(--flag); opacity:.85;
+  outline:1.5px dashed var(--flag-line); outline-offset:-1px; border-radius:3px;
+}
+.ln.ghost .absent{
+  font-family:var(--sans); font-size:.62em; font-weight:700; color:var(--flag);
+  letter-spacing:.12em; padding-left:1.2em; white-space:nowrap;
+}
+
+/* yaml tokens — quiet, so red is the only loud colour */
+.ky{color:var(--ink); font-style:normal}
+.ty{color:var(--amber); font-style:normal}
+.li{color:var(--amber); font-style:normal; font-weight:600}
+.pu{color:var(--faint); font-style:normal}
+
+/* ---------- rail ---------- */
+.rail{
+  position:fixed; z-index:4; top:0; right:0; bottom:0; width:var(--rail);
+  background:var(--surface); border-left:1px solid var(--rule);
+  padding:clamp(1.4rem,3.4vh,2.6rem) clamp(1.2rem,2vw,2rem);
+  display:flex; flex-direction:column; gap:1.15rem; overflow-y:auto;
+  transform:translateX(101%); transition:transform var(--dur) cubic-bezier(.4,0,.2,1);
+}
+body.open .rail{transform:none}
+
+.no{
+  font-family:var(--mono); font-size:clamp(2.4rem,4.4vw,3.9rem); line-height:.9;
+  font-weight:600; color:var(--flag); font-variant-numeric:tabular-nums;
+}
+.wait{font-size:clamp(2.4rem,4.4vw,3.9rem); line-height:.9; font-weight:900; color:var(--rule)}
+.label{
+  font-size:clamp(1.1rem,1.9vw,1.75rem); font-weight:700; line-height:1.42;
+  text-wrap:balance;
+}
+.punch{
+  font-size:clamp(1rem,1.65vw,1.5rem); font-weight:500; line-height:1.6;
+  color:var(--flag); text-wrap:balance;
+  border-left:3px solid var(--flag); padding-left:.85em;
+}
+.note{font-size:clamp(.86rem,1.12vw,1.06rem); line-height:1.85; color:var(--dim); max-width:34em}
+.fix{
+  font-family:var(--mono); font-size:clamp(.7rem,.94vw,.92rem); line-height:1.75;
+  background:var(--ground); border:1px solid var(--rule); border-radius:5px;
+  padding:.85em 1em; white-space:pre-wrap; word-break:break-word;
+}
+.fix .del{color:var(--flag); text-decoration:line-through; opacity:.72; display:block}
+.fix .add{color:var(--fix); display:block}
+.src{
+  margin-top:auto; padding-top:1rem; border-top:1px solid var(--rule);
+  font-size:clamp(.68rem,.86vw,.82rem); line-height:1.7; color:var(--faint);
+}
+.reveal>*{animation:rise var(--dur) cubic-bezier(.2,.7,.3,1) both}
+.reveal>*:nth-child(2){animation-delay:.05s}
+.reveal>*:nth-child(3){animation-delay:.1s}
+.reveal>*:nth-child(4){animation-delay:.14s}
+@keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+
+/* ---------- ticks ---------- */
+.bottom{
+  display:flex; align-items:center; gap:clamp(1rem,2.4vw,2rem);
+  padding:.45rem clamp(1rem,3vw,2.6rem) .5rem; border-top:1px solid var(--rule);
+  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
+}
+.ticks{display:flex; gap:4px; flex:1 1 auto; min-width:2rem}
+.tk{flex:1; height:3px; border-radius:2px; background:var(--rule); transition:background .22s}
+.tk.on{background:var(--flag-line)}
+.tk.done{background:var(--flag)}
+.hint{
+  font-family:var(--mono); font-size:clamp(.62rem,.8vw,.76rem);
+  letter-spacing:.1em; color:var(--faint); white-space:nowrap; flex:none;
+}
+kbd{
+  font:inherit; border:1px solid var(--rule); border-radius:3px;
+  padding:.1em .45em; color:var(--dim);
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* ---------- cover / outro pages ---------- */
+.stage{grid-template-areas:"a"; position:relative}
+.stage>*{grid-area:a}
+.page{display:none; text-align:center; max-width:min(78rem,94vw)}
+body.is-page .spec{display:none}
+body.is-page .page{display:block}
+body.is-cover .top{visibility:hidden}
+body.is-cover .ticks,body.is-cover .hint{visibility:hidden}
+
+.cup{width:clamp(9rem,17vw,15rem); height:auto; color:var(--ink); display:block; margin:0 auto clamp(1.4rem,3vh,2.6rem)}
+.cup .ln2{fill:none; stroke:currentColor; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round}
+.cup .brew{fill:var(--amber); opacity:.82}
+.steam path{
+  fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round;
+  transform-box:fill-box; transform-origin:center; opacity:.28;
+  animation:puff 4.4s ease-in-out infinite;
+}
+.steam path:nth-child(2){animation-delay:.75s}
+.steam path:nth-child(3){animation-delay:1.5s}
+@keyframes puff{0%,100%{opacity:.14;transform:translateY(3px) scaleY(.97)}50%{opacity:.55;transform:translateY(-4px) scaleY(1.03)}}
+
+.tt{
+  font-size:clamp(1.9rem,5.2vw,4.4rem); font-weight:900; line-height:1.28;
+  letter-spacing:.01em; text-wrap:balance;
+}
+.tt em{font-style:normal; color:var(--flag)}
+.sub{
+  margin-top:clamp(.8rem,1.6vh,1.3rem); font-family:var(--mono);
+  font-size:clamp(.78rem,1.3vw,1.1rem); letter-spacing:.26em;
+  text-transform:uppercase; color:var(--dim);
+}
+.by{
+  margin-top:clamp(1.6rem,4vh,3rem); font-family:var(--mono);
+  font-size:clamp(.68rem,.95vw,.86rem); letter-spacing:.16em; color:var(--faint);
+}
+
+/* outro */
+.big{font-size:clamp(1.4rem,3.1vw,2.6rem); font-weight:900; line-height:1.34; text-wrap:balance}
+.big em{font-style:normal; color:var(--flag)}
+.lead{margin-top:.8rem; font-size:clamp(.95rem,1.5vw,1.35rem); color:var(--dim)}
+.qrow{
+  margin-top:clamp(1.1rem,2.6vh,2rem);
+  display:flex; flex-direction:column; align-items:center;
+  gap:clamp(.9rem,2.2vh,1.5rem); text-align:center;
+  color:inherit; text-decoration:none; cursor:pointer;
+  border-radius:14px; padding:.7rem 1.1rem;
+  transition:transform .22s cubic-bezier(.2,.8,.3,1), background .22s;
+}
+.qrow:hover,.qrow:focus-visible{background:color-mix(in srgb, var(--ink) 6%, transparent)}
+.qrow:hover{transform:translateY(-3px)}
+.qrow:hover .repo{color:var(--flag)}
+.qrow:focus-visible{outline:2px solid var(--flag); outline-offset:3px}
+.qrow:active{transform:translateY(-1px)}
+.repo{transition:color .22s}
+.qrow::after{
+  content:'↗'; font-family:var(--mono); font-size:clamp(.7rem,.95vw,.9rem);
+  color:var(--faint); letter-spacing:.1em; transition:color .22s,transform .22s;
+}
+.qrow:hover::after{color:var(--flag); transform:translate(2px,-2px)}
+.qrow>div{min-width:0; display:flex; flex-direction:column; align-items:center; gap:.45rem}
+.qr{height:auto; flex:none; border-radius:5px; background:#FBF8F4; box-shadow:0 1px 0 rgba(0,0,0,.18)}
+.qr path{fill:#17120F}
+.qr-l{
+  width:clamp(15rem,27vw,25rem); border-radius:12px;
+  animation:qrin .42s ease-out both;
+  /* モジュール境界のアンチエイリアスを切る。灰色の縁が滲みに見えるのを防ぐ。
+     小さい方（.qr-s）は 1モジュール1px 未満なので、こちらには掛けない。 */
+  shape-rendering:crispEdges;
+}
+/* transform は使わない。scale で登場させると合成レイヤーが縮小時の解像度で
+   ラスタライズされ、QR のような高周波パターンが甘くなる。 */
+@keyframes qrin{from{opacity:0}to{opacity:1}}
+
+/* ---------- 常時表示のスタンプ（フッター右） ---------- */
+.stamp{
+  display:flex; align-items:center; gap:.6rem;
+  opacity:.72; pointer-events:none; user-select:none; flex:none;
+}
+body.is-outro .stamp{visibility:hidden}
+.qr-s{width:clamp(2.4rem,3.2vw,3.2rem)}
+.stamp-t{
+  font-family:var(--mono); font-size:clamp(.54rem,.7vw,.7rem);
+  line-height:1.55; letter-spacing:.03em; color:var(--dim); text-align:left;
+}
+.stamp-t i{display:block; font-style:normal; color:var(--faint)}
+
+/* ---------- 最終ページ背景の薄字（guidelines 全文） ---------- */
+.wall{
+  position:absolute; inset:0; z-index:0; pointer-events:none; user-select:none;
+  padding:clamp(.7rem,1.8vw,1.8rem); text-align:justify; overflow:hidden;
+  columns:5; column-gap:clamp(.9rem,1.8vw,1.8rem); column-fill:auto;
+  font-size:clamp(.36rem,.55vw,.6rem); line-height:1.72;
+  color:var(--ink); opacity:.15;
+  -webkit-mask-image:radial-gradient(ellipse 44% 62% at 50% 50%, transparent 46%, #000 94%);
+          mask-image:radial-gradient(ellipse 44% 62% at 50% 50%, transparent 46%, #000 94%);
+}
+.wall h2{font-size:1.9em; font-weight:900; margin-bottom:.7em; letter-spacing:.02em; break-after:avoid}
+.wall h3{font-size:1.35em; font-weight:900; margin:1.3em 0 .5em; break-after:avoid; color:var(--flag)}
+.wall p{margin-bottom:.62em; break-inside:avoid}
+.wall p.why{padding-left:.9em; opacity:.68}
+.wall code{font-family:var(--mono); font-size:.94em}
+@media (max-width:900px){.wall{columns:3}}
+.outro{
+  position:relative; z-index:1;
+  padding:clamp(1rem,3vh,2.4rem) clamp(1rem,4vw,3.5rem);
+  background:radial-gradient(ellipse 60% 72% at 50% 50%,
+    var(--ground) 0%, var(--ground) 64%, transparent 90%);
+}
+.repo{font-family:var(--mono); font-size:clamp(.8rem,1.24vw,1.18rem); font-weight:600; letter-spacing:0; white-space:nowrap}
+.url{
+  margin-top:.5rem; font-family:var(--mono); font-size:clamp(.62rem,.88vw,.84rem);
+  color:var(--dim); line-height:1.7; overflow-wrap:anywhere; max-width:38em; text-align:center;
+}
+.badges{margin-top:.35rem; display:flex; gap:.45rem; flex-wrap:wrap; justify-content:center}
+.badge{
+  font-family:var(--mono); font-size:clamp(.6rem,.82vw,.75rem); letter-spacing:.1em;
+  border:1px solid var(--rule); border-radius:999px; padding:.3em .85em; color:var(--dim);
+}
+</style>
+
+<header class="top">
+  <div class="act" id="act">Kissaten API &nbsp;/&nbsp; <b>OpenAPI レビュー</b></div>
+  <div class="count" id="count">指摘 <b>00</b> / 17</div>
+</header>
+
+<main class="stage"><pre class="spec" id="spec"></pre><section class="page" id="page"></section></main>
+
+<aside class="rail" id="rail"></aside>
+
+<footer class="bottom">
+  <div class="ticks" id="ticks"></div>
+  <div class="hint"><kbd>Space</kbd> 進む &nbsp; <kbd>&larr;</kbd> 戻る &nbsp; <kbd>T</kbd> テーマ</div>
+  <div class="stamp" aria-hidden="true">
+  <svg class="qr qr-s" viewBox="-4 -4 45 45"><path d="M0 0h7v1h-7zM9 0h1v1h-1zM11 0h5v1h-5zM19 0h5v1h-5zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM11 1h2v1h-2zM14 1h2v1h-2zM18 1h1v1h-1zM20 1h2v1h-2zM25 1h1v1h-1zM27 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM11 2h1v1h-1zM14 2h1v1h-1zM18 2h1v1h-1zM20 2h2v1h-2zM23 2h1v1h-1zM26 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h4v1h-4zM16 3h2v1h-2zM20 3h1v1h-1zM23 3h1v1h-1zM25 3h3v1h-3zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h5v1h-5zM16 4h1v1h-1zM18 4h8v1h-8zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM11 5h4v1h-4zM16 5h3v1h-3zM20 5h2v1h-2zM25 5h3v1h-3zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h1v1h-1zM16 7h1v1h-1zM21 7h1v1h-1zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM0 8h1v1h-1zM2 8h5v1h-5zM9 8h1v1h-1zM14 8h2v1h-2zM17 8h2v1h-2zM22 8h1v1h-1zM24 8h3v1h-3zM30 8h5v1h-5zM0 9h2v1h-2zM3 9h3v1h-3zM7 9h1v1h-1zM10 9h16v1h-16zM28 9h1v1h-1zM31 9h1v1h-1zM35 9h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM5 10h2v1h-2zM8 10h1v1h-1zM11 10h1v1h-1zM18 10h1v1h-1zM25 10h6v1h-6zM32 10h1v1h-1zM35 10h2v1h-2zM0 11h1v1h-1zM2 11h2v1h-2zM8 11h1v1h-1zM10 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM20 11h2v1h-2zM24 11h1v1h-1zM26 11h1v1h-1zM28 11h2v1h-2zM31 11h2v1h-2zM36 11h1v1h-1zM1 12h4v1h-4zM6 12h2v1h-2zM9 12h1v1h-1zM11 12h2v1h-2zM16 12h4v1h-4zM25 12h2v1h-2zM29 12h2v1h-2zM32 12h5v1h-5zM0 13h2v1h-2zM4 13h1v1h-1zM7 13h1v1h-1zM10 13h1v1h-1zM12 13h2v1h-2zM16 13h10v1h-10zM31 13h1v1h-1zM35 13h1v1h-1zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h2v1h-2zM14 14h4v1h-4zM26 14h2v1h-2zM29 14h5v1h-5zM35 14h2v1h-2zM3 15h2v1h-2zM7 15h2v1h-2zM13 15h1v1h-1zM15 15h2v1h-2zM18 15h4v1h-4zM24 15h1v1h-1zM26 15h1v1h-1zM29 15h4v1h-4zM35 15h1v1h-1zM3 16h1v1h-1zM6 16h1v1h-1zM9 16h3v1h-3zM15 16h3v1h-3zM19 16h1v1h-1zM22 16h1v1h-1zM24 16h4v1h-4zM29 16h2v1h-2zM32 16h1v1h-1zM34 16h3v1h-3zM3 17h1v1h-1zM8 17h4v1h-4zM14 17h2v1h-2zM17 17h5v1h-5zM23 17h1v1h-1zM25 17h1v1h-1zM28 17h2v1h-2zM31 17h1v1h-1zM33 17h3v1h-3zM0 18h2v1h-2zM4 18h3v1h-3zM10 18h7v1h-7zM21 18h1v1h-1zM24 18h1v1h-1zM26 18h2v1h-2zM31 18h1v1h-1zM35 18h2v1h-2zM7 19h2v1h-2zM12 19h1v1h-1zM14 19h2v1h-2zM21 19h4v1h-4zM26 19h5v1h-5zM32 19h1v1h-1zM36 19h1v1h-1zM0 20h4v1h-4zM5 20h2v1h-2zM8 20h3v1h-3zM12 20h2v1h-2zM15 20h1v1h-1zM17 20h1v1h-1zM23 20h3v1h-3zM29 20h2v1h-2zM32 20h3v1h-3zM0 21h1v1h-1zM3 21h2v1h-2zM7 21h2v1h-2zM12 21h1v1h-1zM16 21h2v1h-2zM19 21h2v1h-2zM23 21h1v1h-1zM28 21h2v1h-2zM33 21h1v1h-1zM0 22h2v1h-2zM4 22h1v1h-1zM6 22h1v1h-1zM8 22h2v1h-2zM11 22h3v1h-3zM15 22h2v1h-2zM20 22h2v1h-2zM24 22h1v1h-1zM27 22h2v1h-2zM30 22h4v1h-4zM35 22h2v1h-2zM0 23h1v1h-1zM2 23h2v1h-2zM8 23h1v1h-1zM10 23h6v1h-6zM20 23h3v1h-3zM26 23h4v1h-4zM31 23h2v1h-2zM35 23h2v1h-2zM0 24h1v1h-1zM4 24h1v1h-1zM6 24h6v1h-6zM13 24h2v1h-2zM17 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h4v1h-4zM30 24h1v1h-1zM32 24h1v1h-1zM34 24h2v1h-2zM0 25h3v1h-3zM4 25h2v1h-2zM8 25h2v1h-2zM11 25h2v1h-2zM15 25h2v1h-2zM18 25h3v1h-3zM23 25h1v1h-1zM25 25h1v1h-1zM28 25h1v1h-1zM31 25h1v1h-1zM0 26h1v1h-1zM3 26h4v1h-4zM8 26h3v1h-3zM12 26h1v1h-1zM14 26h1v1h-1zM17 26h2v1h-2zM20 26h1v1h-1zM22 26h1v1h-1zM25 26h3v1h-3zM29 26h2v1h-2zM33 26h1v1h-1zM35 26h2v1h-2zM0 27h1v1h-1zM2 27h1v1h-1zM5 27h1v1h-1zM8 27h1v1h-1zM10 27h1v1h-1zM13 27h2v1h-2zM16 27h1v1h-1zM18 27h1v1h-1zM21 27h3v1h-3zM26 27h1v1h-1zM30 27h3v1h-3zM36 27h1v1h-1zM0 28h1v1h-1zM2 28h1v1h-1zM4 28h1v1h-1zM6 28h3v1h-3zM10 28h3v1h-3zM17 28h1v1h-1zM19 28h1v1h-1zM22 28h2v1h-2zM26 28h9v1h-9zM36 28h1v1h-1zM8 29h4v1h-4zM13 29h1v1h-1zM16 29h1v1h-1zM18 29h3v1h-3zM23 29h1v1h-1zM25 29h1v1h-1zM28 29h1v1h-1zM32 29h2v1h-2zM0 30h7v1h-7zM11 30h1v1h-1zM14 30h2v1h-2zM22 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM34 30h1v1h-1zM36 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM8 31h2v1h-2zM13 31h1v1h-1zM16 31h1v1h-1zM18 31h1v1h-1zM21 31h1v1h-1zM23 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM32 31h2v1h-2zM35 31h1v1h-1zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h2v1h-2zM11 32h1v1h-1zM14 32h2v1h-2zM18 32h1v1h-1zM22 32h11v1h-11zM34 32h3v1h-3zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h1v1h-1zM11 33h1v1h-1zM13 33h1v1h-1zM15 33h1v1h-1zM18 33h3v1h-3zM23 33h3v1h-3zM27 33h1v1h-1zM29 33h2v1h-2zM32 33h1v1h-1zM35 33h2v1h-2zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM8 34h2v1h-2zM12 34h2v1h-2zM15 34h1v1h-1zM20 34h1v1h-1zM22 34h1v1h-1zM24 34h2v1h-2zM27 34h2v1h-2zM35 34h2v1h-2zM0 35h1v1h-1zM6 35h1v1h-1zM9 35h1v1h-1zM12 35h1v1h-1zM14 35h2v1h-2zM19 35h1v1h-1zM21 35h3v1h-3zM26 35h4v1h-4zM32 35h1v1h-1zM36 35h1v1h-1zM0 36h7v1h-7zM8 36h3v1h-3zM13 36h5v1h-5zM20 36h1v1h-1zM22 36h5v1h-5zM29 36h1v1h-1zM32 36h5v1h-5z"/></svg>
+  <div class="stamp-t">openapi-review-guidelines<i>/ja/principles.md</i></div>
+</div>
+</footer>
+
+
+<template id="wallTpl"><div class="wall" aria-hidden="true"><h2>OpenAPI レビューガイドライン（言語非依存の API / スキーマ設計指針）</h2><p>openapi 定義を改変する変更をレビューする際の指摘根拠。特定のプログラミング言語・コード生成器・YAML 構文に依存しない抽象度で記す。概念境界・責務の見極め方は openapi 単体で判断せず、サーバ実装とクライアントの利用実態の両面から確認する。</p><p>ルールは原則であって絶対則ではない。永続化データ・外部 API との互換、業務上の確定した理由がある場合は逸脱しうる。逸脱する変更は、その理由をレビューで明示させる。</p><h3>命名</h3><p><b>簡潔さより明確さを優先する。</b> 短く曖昧な名前より、やや冗長でも一読で意味が取れる名前を選ぶ。背景知識のない読み手が解凍に要する認知コストが、入力短縮の利得を上回る。</p><p class="why">以降の命名ルール（省略語・接頭辞・意味一致等）はこの原則の具体化。</p><p><b>省略語を作らない。</b> 確立した規格語・業界標準語（URL, ID, JWT, QR 等）以外は、長くなっても単語を省略せず綴る。プロジェクト固有・社内固有の略語（クラウド基盤名・社内システム名・<code>usr</code>/<code>txn</code>/<code>cfg</code> のような断片）を識別子・パス・ヘッダ名・enum 値に使わない。</p><p class="why">補完が効く現代では入力短縮の利得はほぼ無く、背景知識のない作業者の逆引きコストと業界標準語との衝突リスクだけが残る。</p><p><b>内部実装・開発経緯を API サーフェスに漏らさない。</b> 採用クラウド名・採用 SDK 名・通信方式・「UI 改善版」のような経緯を、パス・スキーマ名に語句として埋め込まない（例: <code>Article</code> の刷新版を <code>ArticleUiImproved</code>／<code>ArticleNew</code> と名付ける）。意味を表す汎用語にし、世代差は明示的な versioning 戦略（URL の <code>/v2</code>、メディアタイプ、ヘッダ等）で表す。</p><p class="why">経緯ベースの名前は実装変更で嘘になり、その実装を知らない読み手に意味が伝わらない。</p><p><b>名前と実際の値の意味を一致させる。</b> 名前が示す概念と中身がずれていたら改名する（並び順を表す値を「ID」と呼ばない、識別子を「分類」と呼ばない、件数の閾値を <code>~Until</code> と名付けて時刻と誤読させない — 例: バッジ表示の上限件数なら <code>badgeCountUntil</code> でなく <code>maxBadgeCount</code>）。</p><p class="why">名前と意味の乖離は利用側が値を取り違える直接原因になる。</p><p><b>正しい英語を選ぶ。</b> REST 操作に口語的動詞を使わない（<code>see</code>→<code>view</code>）。母語由来の語彙を英語圏で別の意味になるまま持ち込まない（和製英語の直訳 <code>appeal</code>（訴求）→<code>promotion</code> など。母語が何であれ同型の問題は起きる）。形容詞を名詞位置に置かない（<code>Hashed</code>→<code>Hash</code>）。非文法的な真偽値名を作らない（<code>isUse</code>→<code>isInUse</code>）。</p><p class="why">不自然な英語は意図を曖昧にし誤解を招く。</p><p><b>真偽値は意味的に正しい接頭辞を前置し、状態・経験・所有・可否を表し分ける。</b> <code>is</code>（現在の状態・属性）/ <code>has</code>（所有、または現在完了＝過去に～した経験・～済み）/ <code>can</code>（可否）を意味で選ぶ。同じ概念でも軸が違えば使い分ける（過去に一度でも規約に同意したか＝<code>hasAccepted</code>、現時点で最新版の規約に同意済みか＝<code>isAgreementUpToDate</code>）。設定の ON/OFF 状態は能力・可否ではないので <code>can</code> でなく <code>is</code>（<code>canPush</code>→<code>isPushNotificationEnabled</code>）。全 boolean を <code>is</code> に強制しない。</p><p class="why">接頭辞で真偽値であることと、状態か経験かの軸が名前から読み取れる。</p><p><b>真偽値・enum 名に誤読・真逆解釈の余地を残さない。</b> <code>disableAutoUpdate</code>（<code>false</code> が二重否定で読みづらい）、<code>isMarketingEmail</code>（「このメールが販促メールか」か「販促メール受信が ON か」か曖昧）のような名前を、<code>isAutoUpdateEnabled</code> / <code>isMarketingEmailSubscribed</code> のように具体化する。</p><p><b>配列プロパティ名は複数形にする。</b> 自然な複数形を使い、不可算名詞・複数形が不自然な概念に限り <code>~List</code>/<code>~Items</code> を使う。</p><p class="why">名前から要素か集合かを判断できるようにする。</p><p><b>スキーマ名はリソース/概念名を基底にし、用途を表す接尾辞で統一する</b>（<code>Article</code>、<code>ArticleCreateRequest</code>、<code>…Response</code> 等）。HTTP メソッド名そのものを型名に焼き込まない。operation の識別は <code>operationId</code> 側で扱う。</p><p class="why">概念ベースの命名なら同一表現を複数 operation で再利用でき、transport の詳細が型名に漏れない。</p><h3>null 許容性（non-required と null 許容）</h3><p><b>「省略されうる（non-required）」と「値が null になりうる」を区別する。</b> 省略可（キーが送られないことがある）は、オブジェクトの <code>required</code> にそのキーを含めないことで表す（parameter は <code>required</code> を false に）。値が null になりうるのは別概念で、許容する場合のみ明示する（OAS 3.0 は <code>nullable</code>、3.1 は型に <code>null</code> を含める）。両者を混同せず、「省略可」を表したいだけの箇所（query parameter 等）に null 許容を付けない。</p><p class="why">両者の混同は利用側に余計な省略可能型 / 二重 unwrap を生ませる。<code>default</code> は意味付けの注釈であり、値の自動補完を保証しない。</p><p><b>null を許容するなら「実際に null が入るユースケース」を根拠とする。</b> 認証必須経路など null が発生しえない値は非 null で定義する。「設計上の余裕」で安易に null 許容にしない。</p><p><b>null を許容するなら null の意味を description に明記する。</b> 未設定 / 非該当 / 不明 / 取得対象外 / ゼロ件 のどれかを一意に定める。enum フィールドの null は特に誤読されやすいので、可能ならサーバ側で既定値を補完して非 null にすることを検討する。</p><p class="why">null の意味が未定義だとクライアントが独自判断（暫定既定値）するしかなく、表示の一貫性が仕様で保証されない。</p><p><b>「ゼロ件」と「欠落」を区別できるようにする。</b> 読み取りレスポンスの配列は required（省略不可）とし、要素が無いときは空配列を返す。空タグ・特殊値で「存在しない」と「値が空/0」を曖昧にしない。欠落に意味を持たせる場合（部分レスポンス・権限制約・field projection 等）は、その意味を明記する。</p><p class="why">欠落と空の混同は、クライアントに一律フォールバックを強い、未取得/異常を握り潰す。</p><p><b>表示に必須の値はフォールバック順序をクライアント任せにしない。</b> サーバ側で確定して非 null で返すか、確定順序を仕様に明記する。</p><p class="why">仕様化されないフォールバック順はサーバ意図と乖離し表示がずれる。</p><p><b>書き込み系でボディが必須なら必須性を明示する。</b> 未指定で任意に見える状態を残さない。</p><h3>型と書式</h3><p><b>意味が数値なら数値型を、真偽なら boolean 型を使う。</b> 件数・座標・金額などを文字列にしない。真偽を <code>0/1</code> や <code>&#x27;true&#x27;/&#x27;false&#x27;</code> 文字列で代用しない。</p><p class="why">ただし正確な精度・桁を保持する正当な業務理由（金額の固定小数桁、安全整数を超える値の保持 等）があれば文字列を許容する。安易な型変更は誤指摘になり得るため理由を確認する。</p><p><b>カウンタ・件数には整数型を使う。</b> 小数を許す数値型を使わない。</p><p><b>同一値体系の ID は一貫した型・表現で統一する。</b> 同じ ID が箇所により integer / string に分かれる状態を作らない。どの型に寄せるかのプロジェクト個別方針は本指針でなく決定ログ側に置く。</p><p class="why">どちらにも利害がある（integer は採番方式の変更・桁あふれで破壊的変更になりうる、string は形式の機械検証が緩む）。本指針が求めるのは選択でなく統一。</p><p><b>日時文字列には format を付け、date-time は RFC 3339（OpenAPI の date-time format）に統一する。</b> 瞬間は date-time、日付のみで足りる値（購入日・発売日・有効期限）は date。命名も <code>~At</code>（タイムスタンプ）/ <code>~Date</code>（日付）で揃える。UNIX timestamp を使う必然がある箇所のみ理由を添えて例外とする。</p><p class="why">format 無しの string は任意文字列扱いになり、生成クライアントが日時として型安全に扱えず独自パースを強いられる。日付のみの値に時刻を持たせるとタイムゾーン依存のバグ（前日にずれる等）を生む。</p><p><b>整数で時刻を表すなら単位（エポック秒/ミリ秒）を description に必ず明記する。</b> 可能なら RFC 3339 文字列を優先する。</p><p class="why">秒/ミリ秒・タイムスタンプ/経過秒数が不明だと実装事故になる。</p><p><b>タイムゾーン非依存の日付（ユーザーが選んだ日付）は変換せず送受信し、解釈方針を description に書く</b>（「TZ を考慮せずユーザが選択した日付をそのまま送信」等）。</p><p><b>URI/URL を表す文字列には <code>uri</code> format を付ける。</b> 外部データ取り込み経路を含め不正値を弾く（format は相互運用上のヒントなので、強制検証は実装側で担保する）。</p><p class="why">format 指定がないと接頭辞混じり等の不正 URL の混入を検知できず、調査コストにつながり得る。</p><p><b>数値の書式（整数か小数か）を一意に定める。</b> 実値が小数になりうるなら型は小数とし、表示用の丸め方針（切り捨て/四捨五入）を別途明文化する。</p><p class="why">書式を定めないと仕様・サンプル・実レスポンスで整数/小数が揺れ得る。</p><h3>スキーマ構造と再利用</h3><p><b>繰り返し現れる同一構造は共通スキーマに抽出し参照させる。</b> 複数スキーマへの丸ごとコピー（プラットフォーム別のリンク群、通知設定フラグ群）、全パス直書きの共通ヘッダ（<code>x-client-type</code> 等）、共通ページングを components 化して SSOT にする。</p><p class="why">コピーが散在すると変更時に修正漏れる。バックエンドで単一エンティティ由来なら本質的に 1 概念。</p><p><b>大半共通・一部差分の類似スキーマは、共通部を別スキーマに切り出して合成（<code>allOf</code> 等）で再利用する。</b> 差分が識別子だけなら抽象フィールド名への統合も検討する。<code>allOf</code> は制約の合成（AND）であり OO 継承ではないので、共通部と派生の制約が矛盾しないよう設計する。再利用は契約の可読性を損なわない範囲で行う。</p><p><b>契約上の意味が同一な概念は単一のスキーマで表現する。</b> 差が一部フィールドの有無に留まるなら別スキーマを作らず non-required フィールドで表す（例: お気に入り = 記事 + <code>favoritedAt</code>）。ただし作成用/更新用/公開用で必須条件や意味が異なるなら、似ていても分ける。同一概念かの判断は契約上の意味を主とし、内部で同一ドメインモデル由来かは補助根拠に留める。</p><p class="why">クライアントに同義の型を 2 つ持たせず、変換の重複も消える。</p><p><b>階層関係は名前のサフィックス（<code>1st</code>/<code>2nd</code>）でなく、ネストした構造で表す。</b> 将来の階層追加に耐える形にする。参照・更新・差分同期の対象になる要素には、表示名だけでなく安定した id を持たせる。</p><p class="why">name のみの識別は表示名変更を破壊的変更にする。</p><p><b>レスポンス形状が複数あるなら構造で明示する。</b> 相互排他なバリアントは <code>oneOf</code>、複数条件を同時に満たしうる場合のみ <code>anyOf</code> を使い、ペイロード自身が型を見分けるプロパティを持つなら <code>discriminator</code> を併用する。リクエストパラメータによって返る形が変わる場合は、別 operation・別メディアタイプ・別ステータスコードでの表現も検討する。</p><p class="why"><code>discriminator</code> はペイロード内プロパティ値で型を判別する仕組みで、リクエストパラメータ分岐そのものは表せない。分岐が構造化されないと、どの形が返るか仕様上判別できない。</p><p><b>導出可能な値・既存フィールドで表せる状態は、専用フィールドを足さない。</b> 終了日時から計算できるアーカイブ判定（<code>endedAt</code> があれば <code>isArchived</code> は不要）、期限から導出できる期限切れ判定（<code>expiresAt</code> があれば <code>isExpired</code> は不要）、遷移先 URL フィールドの有無で表せる「リンクあり」フラグなどは追加せず元データで表す。</p><p class="why">冗長フィールドは非 MECE と誤用の元。</p><h3>概念モデリングと責務</h3><p><b>1 スキーマに異なる概念を密集させない。</b> 商品基本情報・保証・リンク・遷移先・通知などは概念ごとにネストしたオブジェクトへ分割し、責務を絞る。</p><p class="why">責務が広いオブジェクトは境界が不明瞭で利用側が必要部分を取り出しにくい。</p><p><b>1 つの enum / フィールドに複数の分類軸を詰め込まない。</b> 例えば 1 つの <code>type</code> に <code>broadcast</code>（配信対象の軸）と <code>urgent</code>（重要度の軸）のような別軸の値を混ぜない。粒度の異なる値（汎用語と固有名詞）も混在させない。</p><p class="why">軸が混在した enum は排他関係の根拠が不明で、存在しない組み合わせを選ぶリスクや扱い誤りを生む。</p><p><b>名前が表す概念と内包/並置する要素を一致させる。</b> 「サマリー」が詳細リスト全体を内包するなら名前を実態に合わせる。総件数と未読件数のような軸の違う値を無造作に同列に並べない。</p><p><b>純粋なドメイン API では UI 表示専用のフラグ・文言を持たない。</b> API は意味論的データ（公開日時・遷移先 URL の有無・連携の有無）を返し、表示判断はクライアントに委ねる。状態名も UI 表現（<code>VISIBLE</code>）でなく概念（<code>NOT_LINKED</code>/<code>DELETABLE</code>）で命名する。ただし権限判定・行為可否（<code>isDeletable</code> 等）や server-driven UI を意図する API は例外。</p><p class="why"><code>shouldShowNewBadge</code> / <code>shouldShowShareButton</code> のような表示専用フラグは責務分離違反で、UI 変更時に名前が陳腐化する。</p><p><b>同一フィールドを複数経路から書けて副作用が異なる状態を避ける。</b> 例: 通知購読フラグを通知設定 API とプロフィール一括更新 API の両方から書けるが、外部配信基盤への購読反映は前者でしか行われない。副作用が常に伴うべきなら書き込み経路を 1 つに集約する。</p><p class="why">2 経路の一方だけが副作用を行うと、フラグ値と実状態が乖離し、「どちらの API で更新すべきか」という暗黙知をクライアントに強いる。</p><p><b>異なる関心事を 1 つのパラメータに兼任させない。</b> 例えば 1 つの値に「送信するか」と「再送間隔」を兼ねさせると、間隔を保ったまま送信だけ止める指定ができない。役割が違う制御は別パラメータに分離する。</p><p class="why">兼任は設定が意図通り効かない死に設定を生む。</p><p><b>競合しうる状態の確定計算はサーバ側に置き、クライアントには結果だけ返す。</b> クライアントが現在値を送って上書きする設計（last-write-wins）は複数クライアントの同時更新で値が壊れる。増分はサーバでアトミックに行う。別 API でしか得られない判定結果は、判定材料を持つエンティティのフィールド（<code>isDeletable</code> 等）として返し往復を減らす。</p><p><b>外部 API のコード体系・機械的キーをそのままクライアントに露出させない。</b> 表示用ラベルとコードのマッピングなどはサーバ側で一元的に保持し、レスポンスは「ID・ラベル・選択状態」のような意味の閉じた形で返す。排他選択は単一選択、複数選択可は別表現と、選択の性質で型を選ぶ。（ラベルの提供は「名称」という意味論的データの SSOT をサーバに置くことであり、上述の「UI 表示専用フラグを持たない」とは矛盾しない。）</p><p><b>要素単体で意味的属性（所属分類など）を判定する必要があるなら、その属性を各要素の表現に含める。</b> 分類横断で取得した後に要素と分類を対応付けられない構造にしない（分類ごとにグループ化して返す設計なら不問）。</p><p><b>形式制約は spec に表明し、バリデーションの役割分担を明確にする。</b> 文字数・文字種・範囲のような形式制約は spec の制約（<code>maxLength</code>/<code>pattern</code>/<code>minimum</code> 等）として宣言し、クライアントはそれを即時フィードバック（UX）に使う。ただしクライアント検証は UX の手段であって防御ではなく、サーバは形式・正当性を問わず全入力を検証する。値が実在するか・使用可能かの判定（そのクーポンコードは有効か、その配送先 ID は呼び出し元のものか）はサーバ側のデータを引かないと下せず、spec の制約としても表現できない。</p><h3>一貫性</h3><p><b>同一概念のタグ・パス・スキーマ名・enum 値・プロパティ名の表記と単複を揃える。</b> <code>point</code>/<code>points</code>、<code>myitem</code>/<code>myItem</code>/<code>myItems</code>、<code>iconImageId</code>/<code>iconId</code>、<code>imgUrl</code>/<code>imageUrl</code>、<code>updatedAt</code>/<code>modifiedAt</code> のような揺れを 1 つの正規名に寄せる。</p><p class="why">同一概念の表記揺れは認知負荷を高め取り違えを誘発する。</p><p><b>同一概念は表現方式（型・エンコーディング・書式）も揃える。</b> 片方が string enum・もう片方が integer のような不一致や、日付書式（<code>YYYYMMDD</code> vs <code>YYYY年MM月DD日</code>）の混在を共通スキーマで一本化する。</p><p><b>同一リソースを扱う操作は同じ tag に揃える。</b> tag は利用者にとって理解しやすい論理グルーピングに使い、同一概念の操作が別グループに散らないようにする。</p><p class="why">同一リソースの一操作だけ別 tag だと、ドキュメント上もコード生成上もグルーピングが概念とずれる。</p><p><b>HTTP ヘッダ名・プロパティ名・enum 値の表記規約（大文字小文字・区切り）をファイル全体で統一する。</b></p><p><b>description と実装・パラメータ名を一致させる。</b> 条件記述（「type=all の場合のみ」等）の古い記述を残さず最新の実装名に合わせる。description が謳う区別（「全体向け/個人向け」）が実装上のフィルタとして成立していなければ、区別を実装するか値を統合する。</p><p class="why">コントラクトと実装の乖離はクライアントに存在しない合成ケースを暫定実装させる。</p><p><b>タイポ・コピー起点の残骸を残さない。</b> <code>descripton</code>、別エンドポイント名のままの title、ID なのに「～名」の description などを正す。</p><p class="why">残骸は生成コードのキー名に直結し原因究明しにくいバグになる。</p><p><b>ページネーション方式とパラメータ名を API 群で統一する。</b> offset 方式なら <code>limit</code>/<code>offset</code> のように同一命名・整数型・下限制約で揃える。cursor 方式等を採る場合もその方式と命名を統一する。</p><h3>直感的理解しやすさ</h3><p><b>マジックナンバー・意味の取りにくい値は意味を表す列挙子にする。</b> 正式名称が未確定なら enum 化は仕様確認後まで保留する。</p><p class="why">生数値（<code>accountType = 1/2</code>）は読み手に都度の逆引きを強いる。</p><p><b>enum の各値は名前から意味が読めるようにし、読めない値には説明（標準の <code>description</code>、必要なら vendor extension）を付ける。</b> 対義・順序・状態の関係（対義なら <code>old</code>/<code>new</code>、順位なら <code>entry</code>/<code>bronze</code>/<code>silver</code>/<code>gold</code>）も名前と説明で明確にする。</p><p class="why">固有名詞・略語の enum 値は背景知識なしに意味不明になる。</p><p><b><code>enum</code> は値集合を閉じて管理できる場合のみ使い、宣言したら取りうる有効値をすべて列挙する。</b> example 1 個で済ませない。将来値が増える/外部起源で拡張余地がある場合は、閉じた <code>enum</code> にせず <code>string</code> + 既知値の説明にして前方互換を保つ。</p><p><b>二値で意味が落ちる概念は enum 化する。</b> 例えば検索の一致方式を <code>isFullMatch: bool</code> で表すと、false 側（前方一致）の意味が名前から読めない。<code>queryMatchMode: {exact, prefix}</code> のような戦略 enum にし、意図を型で表し将来拡張に備える。</p><p><b>description は単独で意味を成すよう主語と判定対象を明示する。</b> 「PUSH 通知判定」でなく「PUSH 通知が送信されたか（true: 送信された / false: 送信されなかった）」のように、何を・true/false が何を意味するかを書く。</p><p><b>複雑なドメインは命名で複雑性を隠さず、名前に表出させて一読で理解できるようにする</b>（「簡潔さより明確さ」の適用）。名前で表しきれない方向性・主語は description で補う（「クライアントが受信した通知」等）。</p><p><b>同一概念を指す語の綴りを揃える</b>（例: パスの <code>withdrawConfirmation</code> とスキーマの <code>withdrawalConfirmation</code> のような不一致を作らない）。</p><p class="why">微妙なスペル差は同一性の認識を妨げる。</p><p><b>使われていない/移植時に引き継いだだけのフィールド・パラメータは削除する。</b> 常に null を返すだけ、クライアントが受け取るが利用しない、入力されるがどこにも使われない、廃止済み技術への依存（サービス終了済みの enum 値）などを残さない。</p><p class="why">死にフィールドは誤用と混乱の元。</p><h3>セキュリティ・認証</h3><p><b>全エンドポイント共通の必須リクエストヘッダーは再利用可能な parameter 定義（<code>in: header</code>、<code>components/parameters</code>）に一元化し、各 operation に直書きで繰り返さない。</b> レスポンスヘッダーは <code>components/headers</code> を使う。資格情報として機能するヘッダー（API キー等）のみ security scheme で表し、非認証の共通メタヘッダーを security scheme に載せない（仕様の意味論とずれる）。</p><p class="why">「要るなら全部・要らないなら全部」で済む共通ヘッダー群は、reusable parameter を各 operation から参照する。</p><p><b>spec は利用者（オーディエンス）単位でスコープし、その利用者が呼ばない operation を混在させない。</b> 例えばクライアントが呼ばない server-to-server webhook を同じ spec に含めると、生成クライアントに無意味なメソッドが生え、<code>security: []</code> のような特例も必要になる。</p><p><b>外部 API 由来のスキーマは、受領定義そのままでなく実 API の挙動と一致していることを根拠に書く。</b> パス・レスポンス形式・必須認証フィールド・ハッシュ方式・ID フィールド名の食い違いがないか確認する（疎通検証は実装側で行い、その結果を spec に反映する）。</p><p class="why">受領定義をそのまま転記すると、定義と実態が乖離し得る。</p><p><b>社内固有の不透明な列挙子（拠点コード等）をクライアントに露出させず、意味のある抽象で表現する。</b></p><p><b>example・description に実在の資格情報・トークン・個人情報を書かない。</b> サンプル値は明らかなダミー（<code>user@example.com</code> 等）にする。認証が必要な operation には該当する security scheme を適用し、認証不要を意図する operation にのみ明示的に <code>security: []</code> を付ける — 「指定漏れ」と「意図した非認証」を区別できるようにする。</p><p class="why">spec は配布物であり、実値の混入は漏えいそのもの。認証要件が spec 上不明だと、生成クライアントも人間も試行錯誤で確かめるしかない。</p><h3>spec の健全性</h3><p><b>spec と実装の整合を保証する。</b> spec と実サーバ実装が乖離した状態（手編集スナップショットの取り残し等）を残さない。code-first / design-first いずれでも、唯一の真実源と配布物を一致させる。</p><p class="why">真実源と配布物がずれると、配布 spec に実装に無い null 許容指定が混入し得る。</p><p><b>spec は OpenAPI validator と採用ツール群で検証済みの妥当な状態に保つ。</b> 構文的に壊れた仕様を配布せず、生成・配布前にバリデーションをかける。</p><p class="why">構文エラーでツールのパース・型生成が落ち得る。</p><h3>横断的な進め方</h3><p><b>1 箇所の型/命名/書式の指摘は「同種が各所に複数ある」前提で、ファイル全体へ横展開して直す。</b></p><p class="why">個別修正だけでは規約の揺れが残る。</p><p><b>命名の由来（外部システム名・歴史的経緯）が不明なまま流用しない。</b> 実態と命名根拠を把握し、実態に合わない命名は改名する。</p><p><b>異なる API・データソースが返す同名 ID が同一の値体系（採番元・形式）を指す保証を確認してから突き合わせ前提の設計をする。</b> 採番元が異なるなら対応表を用意するか、突き合わせを前提としない設計に切り替える。</p></div></template>
+
+<script>
+/* ============ the spec, line by line. ⟦⟧ marks a boxable token ============ */
+const LINES = [
+ {k:'a', t:'openapi: 3.0.3'},
+ {k:'b', t:'info:'},
+ {k:'c', t:'  title: Kissaten API'},
+ {k:'d', t:'  version: "1.0.0"'},
+ {k:'e', t:''},
+ {k:'f', t:'paths:'},
+ {k:'path', t:'  /menu-items:'},
+ {k:'get',  t:'    get:'},
+ {k:'g_sec', ghost:true, t:'      security: []'},
+ {k:'res',  t:'      responses:'},
+ {k:'200',  t:'        "200":'},
+ {k:'desc', t:'          description: ⟦メニュー⟧'},
+ {k:'cont', t:'          content:'},
+ {k:'json', t:'            application/json:'},
+ {k:'sch',  t:'              schema:'},
+ {k:'arr',  t:'                type: array'},
+ {k:'itm',  t:'                items:'},
+ {k:'obj',  t:'                  type: object'},
+ {k:'g_req', ghost:true, t:'                  required: [ ... ]'},
+ {k:'props',t:'                  properties:'},
+ {k:'g_id', ghost:true, t:'                    id:          { type: string }'},
+ {k:'name', t:'                    name:        { type: string }'},
+ {k:'price',t:'                    price:       ⟦{ type: string }⟧'},
+ {k:'hot',  t:'                    isHot:       ⟦{ type: integer }⟧'},
+ {k:'cat',  t:'                    ⟦cat⟧:         { type: string, enum: [coffee, tea, ⟦hot⟧, ⟦seasonal⟧] }'},
+ {k:'sold', t:'                    ⟦isNotSold⟧:   ⟦{ type: integer }⟧'},
+ {k:'alg',  t:'                    ⟦allergen⟧:    { type: array, ⟦nullable: true⟧, items: { type: string } }'},
+ {k:'rel',  t:'                    releaseDate: ⟦{ type: integer }⟧'},
+];
+
+/* ============ the 17 findings ============ */
+const W =['','肩慣らし'],
+      A1=['第1幕','型が嘘をついている'],
+      A2=['第2幕','名前が足りない'],
+      A3=['第3幕','そもそも無い'],
+      A4=['第4幕','spec の外側'];
+const F = [
+ {act:W, hit:{desc:[0]},
+  label:'description が1語で、何も言っていない',
+  punch:'「何のメニューが、どういう条件で返るんですか。」',
+  note:'まず、いちばん簡単なやつから。description は単独で意味を成すよう、主語と判定対象を書く。「メニュー」の1語では、何が・どういう条件で返るのかが何も決まっていない。',
+  fix:{del:'description: メニュー', add:'description: 提供中のメニュー一覧。'},
+  src:'直感的理解しやすさ ―「description は単独で意味を成すよう主語と判定対象を明示する」'},
+ {act:A1, hit:{price:[0]},
+  label:'意味が数値なのに文字列',
+  punch:'「"480" から、消費税をどう計算しますか？」',
+  note:'円は最小単位が 1。文字列のままでは計算も比較もできない。固定小数桁や安全整数超えなど、文字列が正当な場合もあるので理由は確認する。',
+  fix:{del:'price: { type: string }', add:'price: { type: integer }   # 税込価格（日本円）'},
+  src:'型と書式 ―「意味が数値なら数値型を、真偽なら boolean 型を使う」'},
+
+ {act:A1, hit:{rel:[0]},
+  label:'単位も、起点も書いていない',
+  punch:'「1788188400。秒ですか、ミリ秒ですか。……そもそも、いつからの秒ですか。」',
+  note:'読み方は「単位 × 起点」の組で決まるが、そのどちらも書いていない。1970-01-01 起点の秒なら 2026-09-01。同じ起点でミリ秒なら 1970-01-22。秒でも起点が Apple のリファレンス日付（2001-01-01）なら 2057-09-01。どれも type: integer とだけ書かれた spec の上では等しく成り立つ。',
+  fix:{del:'releaseDate: { type: integer }   # 1788188400', add:'# RFC 3339 にすると、単位も起点も TZ も一度に消える\nreleaseDate: { type: string, format: date }'},
+  src:'型と書式 ―「整数で時刻を表すなら単位（エポック秒/ミリ秒）を description に必ず明記する。可能なら RFC 3339 文字列を優先する」（理由：秒/ミリ秒・タイムスタンプ/経過秒数が不明だと実装事故になる）'},
+
+ {act:A1, hit:{rel:[0]},
+  label:'日付なのに「瞬間」を持っている',
+  punch:'「サーバは 9月1日 のつもりです。UTC で日付を取り出すと——8月31日。」',
+  note:'日付のみで足りる値に時刻を持たせると、TZ をまたいだ瞬間に日付が動く。発売日が1日早まる。日付は日付として送る。',
+  fix:{del:'releaseDate: { type: integer }', add:'releaseDate: { type: string, format: date }   # "2026-09-01"'},
+  src:'型と書式 ―「瞬間は date-time、日付のみで足りる値（購入日・発売日・有効期限）は date。命名も ~At / ~Date で揃える」'},
+
+ {act:A2, hit:{hot:[0], sold:[1]},
+  label:'boolean 型が1つも無い',
+  punch:'「この spec、boolean が1つも出てきません。」',
+  note:'真偽値は全部 integer。0/1 で真偽を代用している。',
+  src:'型と書式 ―「真偽を 0/1 や \'true\'/\'false\' 文字列で代用しない」'},
+
+ {act:A2, hit:{hot:[0]},
+  label:'値域が閉じていない',
+  punch:'「ホットなら 1。……じゃあ 2 は何ですか？」',
+  note:'「0 以外が真」なら 2 も -1 も真。二値ですらない。',
+  src:'型と書式 ―「意味が真偽なら boolean 型を使う」'},
+
+ {act:A2, hit:{hot:[0]},
+  label:'false 側に名前が無い',
+  punch:'「……じゃあ常温は？」',
+  note:'0 は「hot じゃない」としか言っていない。真偽値は「名前のある値1つ＋名無し1つ」。3つ目の値が出た瞬間に詰む。',
+  fix:{del:'isHot: { type: integer }', add:'temperature: { type: string, enum: [hot, iced, roomTemperature] }'},
+  src:'直感的理解しやすさ ―「二値で意味が落ちる概念は enum 化する」'},
+
+ {act:A2, hit:{cat:[0]},
+  label:'省略語',
+  note:'category。補完が効く時代に3文字ケチっても、残るのは背景知識のない読み手の逆引きコストだけ。',
+  fix:{del:'cat:', add:'category:'},
+  src:'命名 ―「省略語を作らない」「簡潔さより明確さを優先する」'},
+
+ {act:A2, hit:{cat:[1,2]},
+  label:'1つの enum に分類軸が3本',
+  punch:'「hot は種類じゃない。」',
+  note:'アイスコーヒーは coffee ですか、hot ですか。……というか、さっき isHot もありましたよね。軸が混ざった enum は排他の根拠が無く、存在しない組み合わせを選べてしまう。',
+  fix:{del:'cat: enum [coffee, tea, hot, seasonal]', add:'category:         enum [coffee, tea]\ntemperature:      enum [hot, iced, roomTemperature]\navailabilityType: enum [regular, seasonal]'},
+  src:'概念モデリングと責務 ―「1つの enum / フィールドに複数の分類軸を詰め込まない」'},
+
+ {act:A3, ghost:'g_id',
+  label:'識別子が無い',
+  punch:'「『本日のコーヒー』を『ブレンドコーヒー』に改名した瞬間、それは別の商品になります。」',
+  note:'商品を識別しているのが name しかない。表示名は変わる。表示名で識別すると、改名が破壊的変更になる。注文履歴も在庫も繋がらない。',
+  fix:{add:'id: { type: string }   # 表示名とは別の、安定した識別子'},
+  src:'スキーマ構造と再利用 ―「参照・更新・差分同期の対象になる要素には、表示名だけでなく安定した id を持たせる」'},
+
+ {act:A3, ghost:'g_req',
+  label:'7プロパティ全部が省略可能',
+  punch:'「値段が入っていないメニューが返ってきても、仕様上は正しい。」',
+  note:'required が1行も無い。「意図して全部 optional」なのか「書き忘れ」なのか、読み手には区別がつかない。そして「省略されうる」と「値が null になりうる」は別の概念。',
+  fix:{add:'required: [id, name, price, category, temperature, ...]'},
+  src:'null 許容性 ―「『省略されうる（non-required）』と『値が null になりうる』を区別する」'},
+
+ {act:A3, hit:{alg:[0]},
+  label:'配列なのに名前が単数形',
+  note:'名前から要素か集合かを判断できるようにする。',
+  fix:{del:'allergen:', add:'allergens:'},
+  src:'命名 ―「配列プロパティ名は複数形にする」'},
+
+ {act:A3, hit:{alg:[1]},
+  label:'null が2つの意味を持っている',
+  punch:'「『アレルギー物質なし』ですか？ 『まだ調べてない』ですか？」',
+  note:'クライアントは null を見て、どちらかに賭けるしかない。どちらに賭けても、人が死ぬ側の分岐がある。直し方は nullable を外すことではなく、2つの意味にそれぞれ別の名前を与えること。',
+  fix:{del:'allergen: { type: array, nullable: true }', add:'allergens:            # required・非null。該当なしなら空配列\nallergenSurveyStatus: enum [completed, inProgress]'},
+  src:'null 許容性 ―「『ゼロ件』と『欠落』を区別できるようにする」「null の意味を description に明記する」'},
+
+ {act:A3, hit:{sold:[0]},
+  label:'sold が「売り切れた」か「販売中」か決まっていない',
+  note:'語そのものが二通りに読める。この時点でもう、値を見ても何もわからない。',
+  src:'命名 ―「真偽値・enum 名に誤読・真逆解釈の余地を残さない」'},
+
+ {act:A3, hit:{sold:[0,1]},
+  label:'曖昧な語に、否定形が乗っている',
+  punch:'「isNotSold: 0 は——『売り切れていない、わけではない』。」',
+  note:'曖昧な語 × 否定形 × 0/1 の三段重ね。このフィールド1つで、店員も客も売り切れを判定できない。',
+  src:'命名 ―「disableAutoUpdate のような二重否定を、isAutoUpdateEnabled に具体化する」'},
+
+ {act:A3, hit:{sold:[]},
+  label:'そもそも導出できるので要らない',
+  note:'直し方は名前を変えることですらない。在庫数があれば売り切れは導出できる。導出可能な値に専用フィールドを足すと、真実源が2つできる。',
+  fix:{del:'isNotSold: { type: integer }', add:'stockCount: { type: integer, minimum: 0 }'},
+  src:'スキーマ構造と再利用 ―「導出可能な値・既存フィールドで表せる状態は、専用フィールドを足さない」'},
+
+ {act:A4, ghost:'g_sec',
+  label:'認証について何も書いていない',
+  punch:'「認証が要らないんですか？ 書き忘れたんですか？」',
+  note:'allergen の null と完全に同型。不在が2つの意味を持っている。直し方は認証を足すことではない——メニュー閲覧は本当に公開でいい。だから「要らない」と書く。',
+  fix:{add:'security: []   # 認証は要らない、と書いてある'},
+  src:'セキュリティ・認証 ―「認証不要を意図する operation にのみ明示的に security: [] を付ける。『指定漏れ』と『意図した非認証』を区別できるようにする」'},
+
+];
+
+/* ============ render ============ */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hl(s){
+  s = esc(s);
+  s = s.replace(/\b(string|integer|array|object|boolean)\b/g,'<i class="ty">$1</i>');
+  s = s.replace(/\b(true|false|null)\b/g,'<i class="li">$1</i>');
+  s = s.replace(/([{}\[\],])/g,'<i class="pu">$1</i>');
+  s = s.replace(/([A-Za-z_][\w\/.\-]*)(?=\s*:)/g,'<i class="ky">$1</i>');
+  return s;
+}
+function build(t){
+  let out='', i=0;
+  t.split(/⟦|⟧/).forEach((p,n)=>{
+    if(n%2===0){ out += hl(p); }
+    else{
+      const inner = /^[A-Za-z_][\w]*$/.test(p) ? '<i class="ky">'+esc(p)+'</i>' : hl(p);
+      out += '<span class="tok" data-i="'+(i++)+'">'+inner+'</span>';
+    }
+  });
+  return out;
+}
+const spec = document.getElementById('spec');
+let lineNo = 0;
+spec.innerHTML = LINES.map(L=>
+  '<div class="ln'+(L.ghost?' ghost':'')+'" data-k="'+L.k+'">'+
+    '<span class="gut">'+(L.ghost?'&nbsp;':(++lineNo))+'</span>'+
+    '<code>'+build(L.t)+'</code>'+
+    (L.ghost?'<span class="absent">← 無い</span>':'<span></span>')+
+  '</div>').join('');
+
+const ticks = document.getElementById('ticks');
+ticks.innerHTML = F.map(()=>'<div class="tk"></div>').join('');
+const TK = [...ticks.children];
+
+
+const COVER = '<svg class="cup" viewBox="0 0 240 206">'+
+ '<g class="steam">'+
+   '<path d="M96 90 C88 76 104 68 96 54 C90 42 100 36 98 26"/>'+
+   '<path d="M118 86 C110 72 126 64 118 48 C112 34 122 28 120 16"/>'+
+   '<path d="M140 90 C132 76 148 68 140 54 C134 42 144 36 142 26"/>'+
+ '</g>'+
+ '<ellipse class="brew" cx="118" cy="104" rx="55" ry="11.5"/>'+
+ '<ellipse class="ln2" cx="118" cy="104" rx="62" ry="14"/>'+
+ '<path class="ln2" d="M56 104 C56 150 80 172 118 172 C156 172 180 150 180 104"/>'+
+ '<path class="ln2" d="M181 117 C211 114 213 152 180 151"/>'+
+ '<ellipse class="ln2" cx="118" cy="184" rx="84" ry="11"/>'+
+ '</svg>'+
+ '<h1 class="tt">そのカフェ、<em>注文が通りません</em></h1>'+
+ '<p class="sub">OpenAPI review, live</p>'+
+ '<p class="by">松本幸太郎 &nbsp;·&nbsp; @CannotSwift</p>';
+
+const QR_D = 'M0 0h7v1h-7zM9 0h1v1h-1zM11 0h5v1h-5zM19 0h5v1h-5zM30 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM11 1h2v1h-2zM14 1h2v1h-2zM18 1h1v1h-1zM20 1h2v1h-2zM25 1h1v1h-1zM27 1h1v1h-1zM30 1h1v1h-1zM36 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM11 2h1v1h-1zM14 2h1v1h-1zM18 2h1v1h-1zM20 2h2v1h-2zM23 2h1v1h-1zM26 2h1v1h-1zM30 2h1v1h-1zM32 2h3v1h-3zM36 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h4v1h-4zM16 3h2v1h-2zM20 3h1v1h-1zM23 3h1v1h-1zM25 3h3v1h-3zM30 3h1v1h-1zM32 3h3v1h-3zM36 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h5v1h-5zM16 4h1v1h-1zM18 4h8v1h-8zM28 4h1v1h-1zM30 4h1v1h-1zM32 4h3v1h-3zM36 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h1v1h-1zM11 5h4v1h-4zM16 5h3v1h-3zM20 5h2v1h-2zM25 5h3v1h-3zM30 5h1v1h-1zM36 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h7v1h-7zM8 7h1v1h-1zM10 7h1v1h-1zM13 7h1v1h-1zM16 7h1v1h-1zM21 7h1v1h-1zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h1v1h-1zM0 8h1v1h-1zM2 8h5v1h-5zM9 8h1v1h-1zM14 8h2v1h-2zM17 8h2v1h-2zM22 8h1v1h-1zM24 8h3v1h-3zM30 8h5v1h-5zM0 9h2v1h-2zM3 9h3v1h-3zM7 9h1v1h-1zM10 9h16v1h-16zM28 9h1v1h-1zM31 9h1v1h-1zM35 9h1v1h-1zM1 10h1v1h-1zM3 10h1v1h-1zM5 10h2v1h-2zM8 10h1v1h-1zM11 10h1v1h-1zM18 10h1v1h-1zM25 10h6v1h-6zM32 10h1v1h-1zM35 10h2v1h-2zM0 11h1v1h-1zM2 11h2v1h-2zM8 11h1v1h-1zM10 11h1v1h-1zM14 11h1v1h-1zM16 11h1v1h-1zM20 11h2v1h-2zM24 11h1v1h-1zM26 11h1v1h-1zM28 11h2v1h-2zM31 11h2v1h-2zM36 11h1v1h-1zM1 12h4v1h-4zM6 12h2v1h-2zM9 12h1v1h-1zM11 12h2v1h-2zM16 12h4v1h-4zM25 12h2v1h-2zM29 12h2v1h-2zM32 12h5v1h-5zM0 13h2v1h-2zM4 13h1v1h-1zM7 13h1v1h-1zM10 13h1v1h-1zM12 13h2v1h-2zM16 13h10v1h-10zM31 13h1v1h-1zM35 13h1v1h-1zM0 14h3v1h-3zM4 14h3v1h-3zM10 14h2v1h-2zM14 14h4v1h-4zM26 14h2v1h-2zM29 14h5v1h-5zM35 14h2v1h-2zM3 15h2v1h-2zM7 15h2v1h-2zM13 15h1v1h-1zM15 15h2v1h-2zM18 15h4v1h-4zM24 15h1v1h-1zM26 15h1v1h-1zM29 15h4v1h-4zM35 15h1v1h-1zM3 16h1v1h-1zM6 16h1v1h-1zM9 16h3v1h-3zM15 16h3v1h-3zM19 16h1v1h-1zM22 16h1v1h-1zM24 16h4v1h-4zM29 16h2v1h-2zM32 16h1v1h-1zM34 16h3v1h-3zM3 17h1v1h-1zM8 17h4v1h-4zM14 17h2v1h-2zM17 17h5v1h-5zM23 17h1v1h-1zM25 17h1v1h-1zM28 17h2v1h-2zM31 17h1v1h-1zM33 17h3v1h-3zM0 18h2v1h-2zM4 18h3v1h-3zM10 18h7v1h-7zM21 18h1v1h-1zM24 18h1v1h-1zM26 18h2v1h-2zM31 18h1v1h-1zM35 18h2v1h-2zM7 19h2v1h-2zM12 19h1v1h-1zM14 19h2v1h-2zM21 19h4v1h-4zM26 19h5v1h-5zM32 19h1v1h-1zM36 19h1v1h-1zM0 20h4v1h-4zM5 20h2v1h-2zM8 20h3v1h-3zM12 20h2v1h-2zM15 20h1v1h-1zM17 20h1v1h-1zM23 20h3v1h-3zM29 20h2v1h-2zM32 20h3v1h-3zM0 21h1v1h-1zM3 21h2v1h-2zM7 21h2v1h-2zM12 21h1v1h-1zM16 21h2v1h-2zM19 21h2v1h-2zM23 21h1v1h-1zM28 21h2v1h-2zM33 21h1v1h-1zM0 22h2v1h-2zM4 22h1v1h-1zM6 22h1v1h-1zM8 22h2v1h-2zM11 22h3v1h-3zM15 22h2v1h-2zM20 22h2v1h-2zM24 22h1v1h-1zM27 22h2v1h-2zM30 22h4v1h-4zM35 22h2v1h-2zM0 23h1v1h-1zM2 23h2v1h-2zM8 23h1v1h-1zM10 23h6v1h-6zM20 23h3v1h-3zM26 23h4v1h-4zM31 23h2v1h-2zM35 23h2v1h-2zM0 24h1v1h-1zM4 24h1v1h-1zM6 24h6v1h-6zM13 24h2v1h-2zM17 24h1v1h-1zM20 24h1v1h-1zM22 24h1v1h-1zM24 24h4v1h-4zM30 24h1v1h-1zM32 24h1v1h-1zM34 24h2v1h-2zM0 25h3v1h-3zM4 25h2v1h-2zM8 25h2v1h-2zM11 25h2v1h-2zM15 25h2v1h-2zM18 25h3v1h-3zM23 25h1v1h-1zM25 25h1v1h-1zM28 25h1v1h-1zM31 25h1v1h-1zM0 26h1v1h-1zM3 26h4v1h-4zM8 26h3v1h-3zM12 26h1v1h-1zM14 26h1v1h-1zM17 26h2v1h-2zM20 26h1v1h-1zM22 26h1v1h-1zM25 26h3v1h-3zM29 26h2v1h-2zM33 26h1v1h-1zM35 26h2v1h-2zM0 27h1v1h-1zM2 27h1v1h-1zM5 27h1v1h-1zM8 27h1v1h-1zM10 27h1v1h-1zM13 27h2v1h-2zM16 27h1v1h-1zM18 27h1v1h-1zM21 27h3v1h-3zM26 27h1v1h-1zM30 27h3v1h-3zM36 27h1v1h-1zM0 28h1v1h-1zM2 28h1v1h-1zM4 28h1v1h-1zM6 28h3v1h-3zM10 28h3v1h-3zM17 28h1v1h-1zM19 28h1v1h-1zM22 28h2v1h-2zM26 28h9v1h-9zM36 28h1v1h-1zM8 29h4v1h-4zM13 29h1v1h-1zM16 29h1v1h-1zM18 29h3v1h-3zM23 29h1v1h-1zM25 29h1v1h-1zM28 29h1v1h-1zM32 29h2v1h-2zM0 30h7v1h-7zM11 30h1v1h-1zM14 30h2v1h-2zM22 30h1v1h-1zM28 30h1v1h-1zM30 30h1v1h-1zM32 30h1v1h-1zM34 30h1v1h-1zM36 30h1v1h-1zM0 31h1v1h-1zM6 31h1v1h-1zM8 31h2v1h-2zM13 31h1v1h-1zM16 31h1v1h-1zM18 31h1v1h-1zM21 31h1v1h-1zM23 31h1v1h-1zM26 31h1v1h-1zM28 31h1v1h-1zM32 31h2v1h-2zM35 31h1v1h-1zM0 32h1v1h-1zM2 32h3v1h-3zM6 32h1v1h-1zM8 32h2v1h-2zM11 32h1v1h-1zM14 32h2v1h-2zM18 32h1v1h-1zM22 32h11v1h-11zM34 32h3v1h-3zM0 33h1v1h-1zM2 33h3v1h-3zM6 33h1v1h-1zM8 33h1v1h-1zM11 33h1v1h-1zM13 33h1v1h-1zM15 33h1v1h-1zM18 33h3v1h-3zM23 33h3v1h-3zM27 33h1v1h-1zM29 33h2v1h-2zM32 33h1v1h-1zM35 33h2v1h-2zM0 34h1v1h-1zM2 34h3v1h-3zM6 34h1v1h-1zM8 34h2v1h-2zM12 34h2v1h-2zM15 34h1v1h-1zM20 34h1v1h-1zM22 34h1v1h-1zM24 34h2v1h-2zM27 34h2v1h-2zM35 34h2v1h-2zM0 35h1v1h-1zM6 35h1v1h-1zM9 35h1v1h-1zM12 35h1v1h-1zM14 35h2v1h-2zM19 35h1v1h-1zM21 35h3v1h-3zM26 35h4v1h-4zM32 35h1v1h-1zM36 35h1v1h-1zM0 36h7v1h-7zM8 36h3v1h-3zM13 36h5v1h-5zM20 36h1v1h-1zM22 36h5v1h-5zM29 36h1v1h-1zM32 36h5v1h-5z';
+const OUTRO = '<div class="outro">'+
+ '<p class="big">プロパティ <em>7</em> 個で、<em>17</em> 件。</p>'+
+ '<p class="lead">他にも確認したい OpenAPI のルールはこちら</p>'+
+ '<a class="qrow" href="https://github.com/Kota1021/openapi-review-guidelines/blob/main/ja/principles.md" target="_blank" rel="noopener noreferrer">'+
+   '<svg class="qr qr-l" viewBox="-4 -4 45 45"><path d="'+QR_D+'"/></svg>'+
+   '<div>'+
+     '<div class="repo">Kota1021 / openapi-review-guidelines</div>'+
+     '<div class="url">github.com/Kota1021/openapi-review-guidelines<br>&nbsp;&nbsp;/blob/main/ja/principles.md</div>'+
+     '<div class="badges">'+
+       '<span class="badge">MIT</span>'+
+       '<span class="badge">AIレビュー用 Actions テンプレ付き</span>'+
+     '</div>'+
+   '</div>'+
+ '</a>'+
+ '</div>';
+
+/* ============ steps ============ */
+const STEPS = [{t:'cover'},{t:'intro'}];
+F.forEach((f,i)=>{ STEPS.push({t:'ask',f,i}); STEPS.push({t:'tell',f,i}); });
+STEPS.push({t:'outro'});
+
+const rail = document.getElementById('rail');
+const page = document.getElementById('page');
+const actEl = document.getElementById('act');
+const countEl = document.getElementById('count');
+const q = k => spec.querySelector('[data-k="'+k+'"]');
+let step = 0;
+
+function paint(){
+  const s = STEPS[step];
+  spec.querySelectorAll('.ln').forEach(el=>{ el.classList.remove('hit'); el.classList.remove('show'); });
+  spec.querySelectorAll('.tok').forEach(el=>el.classList.remove('on'));
+
+  document.body.classList.remove('open','is-page','is-cover','is-outro');
+
+  if(s.t==='cover'){
+    document.body.classList.add('is-page','is-cover');
+    page.innerHTML = COVER;
+    rail.innerHTML = '';
+    TK.forEach(t=>t.className='tk');
+    return;
+  }
+  if(s.t==='outro'){
+    document.body.classList.add('is-page','is-outro');
+    page.innerHTML = document.getElementById('wallTpl').innerHTML + OUTRO;
+    actEl.innerHTML = '<b>持ち帰り</b>';
+    countEl.innerHTML = '指摘 <b>17</b> / 17';
+    rail.innerHTML = '';
+    TK.forEach(t=>t.className='tk done');
+    return;
+  }
+  if(s.t==='intro'){
+    actEl.innerHTML = 'Kissaten API &nbsp;/&nbsp; <b>OpenAPI レビュー</b>';
+    countEl.innerHTML = '指摘 <b>00</b> / 17';
+    rail.innerHTML = '';
+    TK.forEach(t=>t.className='tk');
+    return;
+  }
+
+  const {f,i} = s;
+  document.body.classList.add('open');
+  actEl.innerHTML = (f.act[0] ? f.act[0]+' &nbsp;/&nbsp; ' : '') + '<b>'+f.act[1]+'</b>';
+  countEl.innerHTML = '指摘 <b>'+String(i+1).padStart(2,'0')+'</b> / 17';
+  TK.forEach((t,n)=>{ t.className = 'tk' + (n<i ? ' done' : n===i ? (s.t==='tell'?' done':' on') : ''); });
+
+  if(f.ghost){
+    const el = q(f.ghost); el.classList.add('show','hit');
+  }else{
+    for(const [k,marks] of Object.entries(f.hit)){
+      const el = q(k); el.classList.add('hit');
+      const toks = el.querySelectorAll('.tok');
+      if(marks.length===0) toks.forEach(t=>t.classList.add('on'));
+      else marks.forEach(m=>toks[m] && toks[m].classList.add('on'));
+    }
+  }
+
+  if(s.t==='ask'){
+    rail.innerHTML = '<div class="no">'+String(i+1).padStart(2,'0')+'</div><div class="wait">？</div>';
+  }else{
+    let h = '<div class="reveal" style="display:flex;flex-direction:column;gap:1.1rem;flex:1">';
+    h += '<div class="no">'+String(i+1).padStart(2,'0')+'</div>';
+    h += '<h2 class="label">'+f.label+'</h2>';
+    if(f.punch) h += '<p class="punch">'+f.punch+'</p>';
+    h += '<p class="note">'+f.note+'</p>';
+    if(f.fix){
+      h += '<div class="fix">'+(f.fix.del?'<span class="del">'+esc(f.fix.del)+'</span>':'')+
+           '<span class="add">'+esc(f.fix.add)+'</span></div>';
+    }
+    h += '<div class="src">'+f.src+'</div></div>';
+    rail.innerHTML = h;
+  }
+}
+const go = d => { step = Math.max(0, Math.min(STEPS.length-1, step+d)); paint(); };
+
+addEventListener('keydown', e=>{
+  const k = e.key;
+  if(document.activeElement && document.activeElement.tagName==='A' && (k===' '||k==='Enter')) return;
+  if([' ','ArrowRight','ArrowDown','PageDown','Enter'].includes(k)){ e.preventDefault(); go(1); }
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ e.preventDefault(); go(-1); }
+  else if(k==='Home'){ e.preventDefault(); step=0; paint(); }
+  else if(k==='End'){ e.preventDefault(); step=STEPS.length-1; paint(); }
+  else if(k==='t'||k==='T'){
+    const cur = document.documentElement.getAttribute('data-theme');
+    const isDark = cur ? cur==='dark' : matchMedia('(prefers-color-scheme:dark)').matches;
+    document.documentElement.setAttribute('data-theme', isDark?'light':'dark');
+  }
+});
+addEventListener('click', e=>{
+  if(e.target.closest('a') || e.target.closest('.rail')) return;
+  go(1);
+});
+let lock = 0;
+addEventListener('wheel', e=>{
+  const now = Date.now(); if(now-lock < 380) return;
+  if(Math.abs(e.deltaY) < 8) return;
+  lock = now; go(e.deltaY > 0 ? 1 : -1);
+}, {passive:true});
+
+paint();
+</script>
+
+</body>
+</html>
