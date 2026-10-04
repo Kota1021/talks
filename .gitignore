@@ -13,3 +13,7 @@ dont-call-it-modal/*
 !dont-call-it-modal/index.html
 !dont-call-it-modal/img/
 !dont-call-it-modal/img/*.jpg
+!person-names/
+person-names/*
+!person-names/README.md
+!person-names/notes.md
