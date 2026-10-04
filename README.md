@@ -21,5 +21,5 @@
 
 「人名は姓と名の2要素から成る」という前提が、そうでないユーザーを締め出していることを、国際規格・人口推計・実サービスの入力フォーム調査から示す。
 
-- **[構造化版](./person-names/README.md)** — 結論（名前のデータ構造）→ アンチパターン → 背景
-- **[調査ノート](./person-names/notes.md)** — 調査の順に並べたもの
+- **[インタラクティブ版](https://kota1021.github.io/talks/person-names/)** — 登壇用。Space / クリックで1事例ずつ進む
+- **[静的版](https://kota1021.github.io/talks/person-names/static.html)** — 結論（名前のデータ構造と規則）→ アンチパターン → 背景。調査結果の全文

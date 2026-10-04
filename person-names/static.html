@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人名は「姓＋名」ではない — 調査結果の全文</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>:root{
+  --ground:#F1EDE8; --surface:#FBF8F4; --rule:#DED4C8;
+  --ink:#241C16; --dim:#6E6055; --faint:#9C8C7E;
+  --flag:#C0361D; --flag-soft:rgba(192,54,29,.10); --flag-line:rgba(192,54,29,.38);
+  --fix:#2C7355; --amber:#9A6B12;
+  --mono:'IBM Plex Mono','Zen Kaku Gothic New',ui-monospace,monospace;
+  --sans:'Zen Kaku Gothic New',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#17120F; --surface:#1E1814; --rule:#372C25;
+    --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52;
+    --flag:#F2603F; --flag-soft:rgba(242,96,63,.13); --flag-line:rgba(242,96,63,.45);
+    --fix:#5FBE93; --amber:#D9A441;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#17120F; --surface:#1E1814; --rule:#372C25;
+  --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52;
+  --flag:#F2603F; --flag-soft:rgba(242,96,63,.13); --flag-line:rgba(242,96,63,.45);
+  --fix:#5FBE93; --amber:#D9A441;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--ground); color:var(--ink); font-family:var(--sans);
+  -webkit-font-smoothing:antialiased; line-height:1.8;
+}
+.wrap{max-width:62rem; margin-inline:auto; padding-inline:clamp(1.1rem,4vw,2.5rem)}
+
+/* ---------- head ---------- */
+.head{border-bottom:1px solid var(--rule); padding:clamp(3rem,9vh,6rem) 0 clamp(2rem,6vh,3.5rem)}
+.eyebrow{
+  font-family:var(--mono); font-size:.78rem; letter-spacing:.28em;
+  text-transform:uppercase; color:var(--dim); margin-bottom:1rem;
+}
+h1{font-size:clamp(1.9rem,5.4vw,3.6rem); font-weight:900; line-height:1.24; text-wrap:balance}
+h1 em{font-style:normal; color:var(--flag)}
+.tagline{margin-top:1.1rem; color:var(--dim); font-size:clamp(.95rem,1.6vw,1.15rem)}
+.tagline b{color:var(--ink); font-weight:700}
+.toc{margin-top:1.6rem; display:flex; gap:.5rem; flex-wrap:wrap; list-style:none; padding-left:0}
+.toc a{
+  font-family:var(--mono); font-size:.74rem; letter-spacing:.08em; color:var(--dim);
+  border:1px solid var(--rule); border-radius:999px; padding:.3em .9em; text-decoration:none;
+}
+.toc a:hover{color:var(--flag); border-color:var(--flag)}
+
+/* ---------- sections ---------- */
+.part{margin-top:clamp(2.6rem,7vh,4.5rem)}
+.sec{
+  font-family:var(--mono); font-size:.8rem; font-weight:600; letter-spacing:.22em;
+  text-transform:uppercase; color:var(--dim);
+  padding-bottom:.7rem; border-bottom:1px solid var(--rule); margin-bottom:1.6rem;
+}
+.act{
+  margin:clamp(2.4rem,6vh,3.6rem) 0 1.2rem;
+  font-size:clamp(1.15rem,2.4vw,1.6rem); font-weight:900; line-height:1.4;
+  display:flex; align-items:baseline; gap:.8rem;
+}
+.act::after{content:''; flex:1; height:1px; background:var(--rule)}
+.act-n{
+  font-family:var(--mono); font-size:.62em; font-weight:600; letter-spacing:.16em;
+  color:var(--flag); margin-right:.15em;
+}
+h3{font-size:clamp(1.02rem,1.9vw,1.25rem); font-weight:700; line-height:1.5; margin:1.8rem 0 .6rem}
+h4{font-size:.95rem; font-weight:700; margin:1.2rem 0 .3rem}
+p,ul,ol,table,pre,.punch{margin-top:.7rem}
+.part>p,.body>p,li{color:var(--dim); font-size:clamp(.9rem,1.35vw,1rem)}
+p b,li b,td b{color:var(--ink)}
+ul,ol{padding-left:1.4em}
+li{margin-top:.25rem}
+li::marker{color:var(--faint)}
+code{font-family:var(--mono); font-size:.92em; background:var(--surface); border:1px solid var(--rule);
+     border-radius:3px; padding:.02em .3em; color:var(--ink)}
+.punch{
+  color:var(--flag); font-weight:500; font-size:clamp(1rem,1.8vw,1.22rem); line-height:1.65;
+  border-left:3px solid var(--flag); padding-left:.85em; text-wrap:balance;
+}
+.tbd{color:var(--amber); font-weight:700}
+
+/* ---------- tables ---------- */
+.tw{overflow-x:auto; margin-top:.8rem}
+table{border-collapse:collapse; width:100%; font-size:clamp(.8rem,1.2vw,.92rem); line-height:1.65}
+th,td{text-align:left; vertical-align:top; padding:.55em .8em; border-bottom:1px solid var(--rule)}
+th{font-family:var(--mono); font-size:.78em; letter-spacing:.08em; color:var(--faint); font-weight:500; white-space:nowrap}
+td{color:var(--dim)}
+td:first-child{color:var(--ink); font-weight:700; white-space:nowrap}
+td.n{font-family:var(--mono); color:var(--flag); font-weight:600; font-variant-numeric:tabular-nums}
+td.no-wrap{white-space:nowrap}
+
+/* ---------- data structure ---------- */
+.tree{
+  font-family:var(--mono); font-size:clamp(.66rem,1.2vw,.88rem); line-height:1.85;
+  background:var(--surface); border:1px solid var(--rule); border-radius:8px;
+  padding:1rem 1.2rem; overflow-x:auto; white-space:pre; color:var(--ink);
+}
+.tree i{font-style:normal; color:var(--faint)}
+.tree .ty{color:var(--amber)}
+.tree .k{color:var(--flag); font-weight:600}
+
+/* ---------- anti-pattern cards ---------- */
+.find{
+  display:grid; grid-template-columns:3.6rem 1fr; gap:clamp(.7rem,2vw,1.4rem);
+  padding:clamp(1.2rem,3vh,1.9rem) 0; border-top:1px solid var(--rule);
+  break-inside:avoid;
+}
+.find:first-of-type{border-top:none}
+.no{
+  font-family:var(--mono); font-size:clamp(1.3rem,3vw,1.9rem); font-weight:600;
+  color:var(--flag); line-height:1.1; font-variant-numeric:tabular-nums;
+}
+.body{min-width:0}
+.body>h3{margin-top:0}
+.rw{
+  font-family:var(--mono); font-size:clamp(.72rem,1.1vw,.86rem); line-height:1.85;
+  background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+  padding:.75em 1em; margin-top:.8rem;
+}
+.rw .del{color:var(--flag); text-decoration:line-through; opacity:.72}
+.rw .add{color:var(--fix)}
+.rw .arr{color:var(--faint); padding:0 .5em}
+
+/* ---------- cta ---------- */
+.cta{
+  display:flex; align-items:center; gap:clamp(1.2rem,3.5vw,2.4rem); flex-wrap:wrap;
+  color:inherit; text-decoration:none; border:1px solid var(--rule); border-radius:12px;
+  background:var(--surface); padding:clamp(1.2rem,3vw,2rem);
+}
+.cta-lead{font-size:clamp(1.15rem,2.4vw,1.6rem); font-weight:900; line-height:1.5}
+.cta-lead em{font-style:normal; color:var(--flag)}
+
+/* ---------- reference ---------- */
+.refs h4{font-family:var(--mono); font-size:.76rem; letter-spacing:.14em; color:var(--faint); font-weight:500; margin-top:1.4rem}
+.refs ul{list-style:none; padding-left:0}
+.refs li{font-size:.85rem; overflow-wrap:anywhere}
+.refs a{color:var(--dim); text-decoration-color:var(--rule); text-underline-offset:.2em}
+.refs a:hover{color:var(--flag)}
+
+/* ---------- foot ---------- */
+.foot{
+  margin-top:clamp(3rem,8vh,5rem); border-top:1px solid var(--rule);
+  padding:2rem 0 3rem; font-size:.82rem; color:var(--dim);
+}
+.foot .dim{color:var(--faint); margin-top:.4rem; font-size:.76rem}
+.foot a{color:var(--dim)}
+
+/* ---------- print ---------- */
+@media print{
+  :root{
+    --ground:#fff; --surface:#faf9f7; --rule:#d5cec6; --ink:#1a1512;
+    --dim:#4a423b; --faint:#7b7169; --flag:#a82d17; --fix:#20573f;
+  }
+  body{line-height:1.7}
+  .head{padding:0 0 1.4rem}
+  h1{font-size:1.9rem}
+  .wrap{max-width:none; padding-inline:0}
+  .toc{display:none}
+  .find,tr{break-inside:avoid; page-break-inside:avoid}
+  .act,h3{break-after:avoid}
+  .foot{padding-bottom:0}
+  a{color:inherit; text-decoration:none}
+  @page{margin:16mm 14mm}
+}
+</style>
+</head>
+<body>
+<header class="head">
+  <div class="wrap">
+    <p class="eyebrow">Personal names, field-tested</p>
+    <h1>人名は<em style="white-space:nowrap">「姓＋名」</em>ではない</h1>
+    <p class="tagline">「人名は姓と名の2要素から成る」という前提は、それに当てはまらない人を締め出す。<br>
+      2欄に収まらない人は <b>約2割、15〜17億人</b>。</p>
+    <ul class="toc">
+      <li><a href="#conclusion">1. 結論</a></li>
+      <li><a href="#antipatterns">2. アンチパターン</a></li>
+      <li><a href="#background">3. 背景</a></li>
+      <li><a href="#refs">参考資料</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ================================================================ -->
+<section class="part" id="conclusion">
+  <h2 class="sec">1. 結論：名前はどのような構造で扱うべきか</h2>
+
+  <h2 class="act"><span>原則</span></h2>
+  <p class="punch">名前は「本人が申告した原本の文字列」と「用途ごとに作る派生表現」の2層で扱う。</p>
+  <ul>
+    <li>原本は分割せず、必須の構造も持たせず、書き換えない。</li>
+    <li>分割、読み、ローマ字表記、照合キー、外部システム向けの値は、すべて原本とは別に持つ派生表現とする。</li>
+    <li>これは国際規格（ICAO Doc 9303）が採っている構造そのものである。旅券は、各国の文字で書いた目視欄（VIZ）を原本とし、機械読取欄（MRZ）を意図的に情報を落とした派生表現として扱う。</li>
+  </ul>
+
+  <h2 class="act"><span>データ構造</span></h2>
+<pre class="tree"><span class="k">PersonName</span>
+├─ fullName            : <span class="ty">String</span>     <i>// 原本。必須。入力されたまま保存</i>
+├─ components?         : 任意       <i>// 分割が必要な用途のときだけ持つ</i>
+│   ├─ primary         : <span class="ty">String</span>     <i>// 第一識別子（姓に相当。分けられなければ名前全体）</i>
+│   └─ secondary?      : <span class="ty">String</span>     <i>// 第二識別子（名に相当）。空でもよい</i>
+├─ phonetic?           : <span class="ty">String</span>     <i>// 読み。本人が入力する</i>
+├─ latin?              : <span class="ty">String</span>     <i>// ラテン文字表記。本人が入力する（自動生成しない）</i>
+├─ preferredName?      : <span class="ty">String</span>     <i>// 呼びかけに使う名前</i>
+├─ honorific?          : <span class="ty">String</span>     <i>// 敬称・称号。自由入力</i>
+├─ aliases[]           : 種別付き   <i>// 通称・以前の氏名・職業上の名前</i>
+├─ history[]           : 有効期間付き <i>// 変更履歴</i>
+├─ note?               : <span class="ty">String</span>     <i>// Unicodeで表せない字などの補足</i>
+└─ <span class="k">derived</span>             : 原本から生成する値（原本の側には書き戻さない）
+    ├─ matchKey        : 照合用に正規化した値（NFKC＋casefoldなど）
+    ├─ sortKey         : 並べ替え用のキー（本人入力かロケール規則に従う）
+    └─ exports{}       : 外部システム向けに変換した値（本人が確認・編集）</pre>
+
+  <h2 class="act"><span>規則</span></h2>
+  <p>#番号は McKenzie「Falsehoods Programmers Believe About Names」の項目番号。</p>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>規則</th><th>根拠</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1</td><td>用途（照合・表示・呼びかけ・並べ替え・外部連携）を先に決め、必要なものだけを集める</td><td class="no-wrap">GOV.UK、USWDS</td></tr>
+      <tr><td class="n">2</td><td><b>正となる欄は「氏名（全体）」1つ</b>にし、入力されたまま保存する</td><td class="no-wrap">GOV.UK、誤謬#30</td></tr>
+      <tr><td class="n">3</td><td>分割が必要なら、ICAOの第一識別子／第二識別子の考え方で分け、<b>第二識別子は空でもよい</b>ことにする</td><td class="no-wrap">ICAO 9303</td></tr>
+      <tr><td class="n">4</td><td>字種はUnicodeを全面的に受け付ける。拒否するのは制御文字と不可視文字程度</td><td class="no-wrap">GOV.UK、誤謬#9</td></tr>
+      <tr><td class="n">5</td><td>長さに小さな上限を設けない。上限は乱用対策として十分に大きく取る（目安は1欄128文字以上）</td><td class="no-wrap">USWDS、誤謬#6</td></tr>
+      <tr><td class="n">6</td><td>原文字・ラテン文字・読みは別の欄にし、本人に入力してもらう。自動でローマ字化した値を正としない</td><td class="no-wrap">ICAO付録B、誤謬#30</td></tr>
+      <tr><td class="n">7</td><td>敬称・称号は別の任意欄にし、名前から勝手に削らない</td><td class="no-wrap">ICAO 3.4、GOV.UK</td></tr>
+      <tr><td class="n">8</td><td>照合用の正規化は派生キーとして作り、原本は書き換えない。NFCでもCJK互換漢字は別の字に置き換わる</td><td class="no-wrap">誤謬#38</td></tr>
+      <tr><td class="n">9</td><td>名前を一意キーや同一人物の判定に使わない</td><td class="no-wrap">誤謬#21〜#23</td></tr>
+      <tr><td class="n">10</td><td>変更履歴と複数の名前を持てるようにし、ラベルは「旧姓」ではなく「以前の氏名」にする</td><td class="no-wrap">USWDS、W3C</td></tr>
+      <tr><td class="n">11</td><td>「お呼びする名前」の欄を別に設ける</td><td class="no-wrap">USWDS、W3C</td></tr>
+      <tr><td class="n">12</td><td>並べ替えのキーは本人の入力か、ロケールの規則に従う</td><td class="no-wrap">W3C</td></tr>
+      <tr><td class="n">13</td><td>本名の欄に不適切語フィルタをかけず、1文字の名前も拒否しない</td><td class="no-wrap">USWDS、誤謬#31</td></tr>
+      <tr><td class="n">14</td><td>外部連携用の値は明示的な規則で派生させ、別に保存する。本人に確認・編集してもらう</td><td class="no-wrap">ICAO（MRZの生成規則）</td></tr>
+      <tr><td class="n">15</td><td>Unicodeで表せない字に備えて補足欄を用意する</td><td class="no-wrap">誤謬#11</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 class="act"><span>一言でいうと</span></h2>
+  <p class="punch">分割しない、必須にしない、書き換えない、文字を絞らない。</p>
+</section>
+
+<!-- ================================================================ -->
+<section class="part" id="antipatterns">
+  <h2 class="sec">2. アンチパターン：実サービスの例</h2>
+  <p>調査方法: Playwrightでダミー値を入力し、検証メッセージを観察した（2026年10月時点）。アカウントの作成・確定には一度も到達させていない。</p>
+
+  <h2 class="act"><span>結果一覧</span></h2>
+  <div class="tw"><table>
+    <thead><tr><th>サービス</th><th>姓または名が空</th><th>文字の範囲</th><th>長さの上限</th><th>読み（カナ）</th></tr></thead>
+    <tbody>
+      <tr><td>Google</td><td><b>姓は任意</b></td><td>ほぼUnicode全般</td><td>名は50文字</td><td>なし</td></tr>
+      <tr><td>Apple</td><td>両方必須</td><td>ほぼUnicode全般</td><td>名は32文字</td><td>なし</td></tr>
+      <tr><td>Facebook</td><td>両方必須（1語の名前は別途申請）</td><td>独自の推定ルール</td><td>あり</td><td>なし</td></tr>
+      <tr><td>楽天（旧フォーム）</td><td>両方必須</td><td><b>JIS X 0208相当</b></td><td>各欄85文字</td><td>全角カタカナで必須</td></tr>
+      <tr><td>ゆうちょダイレクト</td><td><b>カナ1欄のみ</b></td><td>カタカナ中心</td><td>30文字</td><td>唯一の氏名欄</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 class="act"><span>6つの類型</span></h2>
+
+  <article class="find"><div class="no">AP1</div><div class="body">
+    <h3>姓と名を両方必須にし、1語の名前を裏技で吸収させる</h3>
+    <div class="tw"><table>
+      <thead><tr><th>サービス</th><th>観察した挙動</th></tr></thead>
+      <tbody>
+        <tr><td>楽天（旧フォーム）</td><td>姓だけ・名だけは拒否。<b>同じ語を両方に入れると通る</b></td></tr>
+        <tr><td>Facebook</td><td>姓または名が空だと「短すぎます」で拒否。1語の名前はフォームの外で申請させ、その申請でも「同じ名前を両方の欄に入れて送信」と案内している</td></tr>
+        <tr><td>Apple</td><td>姓だけ・名だけは拒否（ミャンマー名を名の欄だけに入れて確認）</td></tr>
+      </tbody>
+    </table></div>
+    <p>インドネシア、ミャンマー、タミル系などの人は、正しい名前のままでは登録できない。</p>
+  </div></article>
+
+  <article class="find"><div class="no">AP2</div><div class="body">
+    <h3>文字コードの都合で文字種を絞る</h3>
+    <h4>楽天（旧フォーム）</h4>
+    <p>拒否された入力（「登録できない文字があります」）:</p>
+    <ul>
+      <li>ダイアクリティカルマーク付きの文字（ü、ë）</li>
+      <li>異体字（髙、𠮷）、互換漢字（﨑）</li>
+      <li>ハングル、簡体字、アラビア文字、ミャンマー文字、シンハラ文字</li>
+      <li>絵文字、丸数字</li>
+    </ul>
+    <p>通った入力: キリル文字（Иванов）、数字、<code>O'Brien-Smith</code></p>
+    <p>通る文字と拒否される文字の境界はJIS X 0208とよく一致する。ページ自体はUTF-8なので、制約はバックエンド側にあると<b>推測</b>する。フリガナ欄では中黒「・」も拒否される。</p>
+    <h4>ゆうちょダイレクト（新規利用申込み）</h4>
+    <ul>
+      <li>氏名欄は「氏名（カナ）」の<b>1欄だけ</b>で、姓名を分割しない。そのため1語の名前はそのまま入力できる。</li>
+      <li>拒否された入力: ひらがな、半角カナ、漢字、<b>中黒「・」</b>。「メアリー・アン」のような外国人名の区切りを表現できない。</li>
+      <li>通った入力: ラテン文字、ハイフン、ピリオド、括弧、スペース。</li>
+      <li>規定には、カナ氏名が一致しないと申し込めない旨の条項がある。このカナ氏名が照合キーになっている。</li>
+      <li>試行を重ねたところ「一定回数誤りが続きましたのでログアウトしました」と表示されたため、検証を打ち切った。</li>
+    </ul>
+    <p>楽天もゆうちょも文字の範囲が狭く、ベトナム語・韓国語・多くのヨーロッパ系の名前は本来の綴りで登録できない。</p>
+  </div></article>
+
+  <article class="find"><div class="no">AP3</div><div class="body">
+    <h3>エラーを出さずに書き換える</h3>
+    <h4>楽天（旧フォーム）</h4>
+    <div class="rw">
+      <div><span class="del">山&lt;田</span><span class="arr">→</span><span class="add">山</span>　<i>（<code>&lt;</code> 以降が消える）</i></div>
+      <div><span class="del">デ ラ トーレ</span><span class="arr">→</span><span class="add">デラトーレ</span>　<i>（スペースが消える）</i></div>
+      <div><span class="del">ひらがな・半角カナ</span><span class="arr">→</span><span class="add">全角カタカナ</span></div>
+    </div>
+    <p>最も危険な類型。本人が知らないうちに原本が変わり、後の照合失敗の原因になる。</p>
+  </div></article>
+
+  <article class="find"><div class="no">AP4</div><div class="body">
+    <h3>「名前らしさ」を推定で判定する</h3>
+    <h4>Facebook</h4>
+    <div class="tw"><table>
+      <thead><tr><th>入力</th><th>結果</th></tr></thead>
+      <tbody>
+        <tr><td>数字</td><td>拒否</td></tr>
+        <tr><td><code>mcDONALD</code></td><td>拒否（大文字が多すぎる）</td></tr>
+        <tr><td><code>Dr. Smith</code></td><td>拒否（ピリオドが多すぎる）</td></tr>
+        <tr><td><code>Zoë</code></td><td><b>拒否</b>（「タイトルまたはシンボル」扱い）</td></tr>
+        <tr><td><code>Müller</code>、<code>José</code>、<code>Nguyễn</code></td><td>通過</td></tr>
+        <tr><td><code>Pablo Diego Jose Francisco de Paula Juan</code></td><td>拒否（「有名人と同じ名前」）</td></tr>
+        <tr><td>シンハラ文字</td><td>拒否</td></tr>
+      </tbody>
+    </table></div>
+    <p>判定基準に一貫性がなく、正当な名前を誤って拒否する。サーバー側の最終審査は<b>未検証</b>。</p>
+    <h4>Slack</h4>
+    <p>英語の予約語に <code>ja</code> と <code>ms</code> が含まれ、フルネームにも使えない。Jaという名前の人は登録できない。</p>
+  </div></article>
+
+  <article class="find"><div class="no">AP5</div><div class="body">
+    <h3>長さの上限が小さい</h3>
+    <div class="tw"><table>
+      <thead><tr><th>サービス</th><th>上限</th></tr></thead>
+      <tbody>
+        <tr><td>Apple</td><td>名は<b>32文字</b>（調査した中で最も厳しい）</td></tr>
+        <tr><td>Google</td><td>名は50文字（51文字以上は拒否）</td></tr>
+        <tr><td>楽天</td><td>各欄85文字</td></tr>
+        <tr><td>ゆうちょ</td><td>30文字（HTML上の上限）</td></tr>
+      </tbody>
+    </table></div>
+    <p>USWDSが推奨する1欄128文字に対して、いずれも小さい。</p>
+    <p>Appleは姓と名が両方必須で、<code>&lt;</code> と絵文字は拒否、それ以外の文字はほぼ通過した。CAPTCHAがあるため送信はしておらず、サーバー側の判定は<b>未検証</b>。</p>
+  </div></article>
+
+  <article class="find"><div class="no">AP6</div><div class="body">
+    <h3>制約を利用者の運用で吸収させる</h3>
+    <h4>三重県 e-TUMO apply（電子申請）</h4>
+    <p>システムの制約を回避するため、県は利用者に次のように案内している。</p>
+    <ul>
+      <li>読みをカナで表せない場合は、「氏」に"シ"、「名」に"メイ"と入力する。</li>
+      <li>姓が後ろに来る文化の名前は、名を「氏」の欄に、姓を「名」の欄に入れる。<br>
+        例: <code>John Fitzgerald Kennedy</code> → 「氏」John、「名」Fitzgerald Kennedy</li>
+    </ul>
+    <p><b>保存されるデータの意味が壊れる。</b></p>
+  </div></article>
+
+  <article class="find"><div class="no">参考</div><div class="body">
+    <h3>比較的よい例（Google）</h3>
+    <ul>
+      <li>姓は任意。</li>
+      <li>名のみの入力、1文字の名前、数字、<code>Zoë</code>、<code>𠮷</code>、ハングル、アラビア文字、ミャンマー文字、シンハラ文字、文字種の混在はすべて通過。</li>
+      <li>拒否されたのは <code>&lt;</code>、絵文字、URL風の文字列、空白のみ、51文字以上。多くは乱用対策と見られる。</li>
+    </ul>
+  </div></article>
+
+  <h2 class="act"><span>観察から言えること</span></h2>
+  <ol>
+    <li><b>姓を必須にするかどうかは、照合キーの設計で決まっている。</b>表示用の名前を扱うGoogleは姓を任意にし、身元照合を重視するFacebook・楽天・Appleは姓と名を両方必須にしている。1語の名前は「同じ語を両方の欄に入れる」という<b>裏技</b>で扱われている。</li>
+    <li><b>国産サービスは文字セットが狭い。</b>楽天はJIS X 0208相当、ゆうちょはカタカナ中心。</li>
+    <li><b>黙った書き換えが最も危険。</b>本人が知らないうちに原本が変わり、後で照合に失敗する原因になる。</li>
+    <li><b>推定による判定は、正当な名前を誤って拒否する。</b>Facebookの <code>Zoë</code> が例。</li>
+  </ol>
+</section>
+
+<!-- ================================================================ -->
+<section class="part" id="background">
+  <h2 class="sec">3. 背景</h2>
+
+  <h2 class="act"><span><span class="act-n">3.1</span> 名前の実体</span></h2>
+
+  <h3>誤謬リスト</h3>
+  <p>Patrick McKenzie「Falsehoods Programmers Believe About Names」（2010）は、プログラマーが名前について無自覚に置いている前提を40項目にわたって否定した。その一部を抜粋する。</p>
+  <ul>
+    <li>人には正確に1つのフルネームがある（#1）</li>
+    <li>名前は決まった文字数に収まる（#6）</li>
+    <li>名前はASCIIで表せる（#9）</li>
+    <li>名前はUnicodeで表せる（#11）</li>
+    <li>名前には少なくとも1つ、家族で共有される部分がある（#18）</li>
+    <li>人には名前がある（#40）</li>
+  </ul>
+  <p>このトークでは「姓＋名の2要素」という前提に絞り、それが実際に誰をどう締め出しているかを、規格・人口・実サービスの3方向から確認する。</p>
+
+  <h3>世界の名前の構造</h3>
+  <p>出典は英国政府作成・インターポール配布の命名慣習ガイド（2006）、W3C「Personal names around the world」、各種報道。</p>
+  <h4>姓がない／大半が姓を持たない</h4>
+  <div class="tw"><table>
+    <thead><tr><th>国・地域</th><th>構造</th></tr></thead>
+    <tbody>
+      <tr><td>インドネシア</td><td>多くの人に姓がない。1語だけの名前もある（スカルノ、スハルト）。旅券にも姓名の区別がない</td></tr>
+      <tr><td>ミャンマー</td><td>姓の伝統がなく、名前全体が個人名。「U」のような敬称が名前と一体化する</td></tr>
+      <tr><td>タミル系（スリランカ・南インド）</td><td>「父の名＋本人の名」。父の名は頭文字にされることが多い（A. Rasiah）</td></tr>
+      <tr><td>ソマリア</td><td>「本人の名＋父の名＋祖父の名」。本人を特定するには3つすべてが必要</td></tr>
+      <tr><td>アフガニスタン</td><td>伝統的に姓がない</td></tr>
+    </tbody>
+  </table></div>
+  <h4>姓に見えるが、実は父称</h4>
+  <ul>
+    <li><b>アイスランド</b>: 父の名＋-son／-dóttir。電話帳は名で並ぶ。</li>
+    <li><b>マレーシア</b>: Isa bin Osman のように、bin（〜の息子）で父の名をつなぐ。</li>
+    <li><b>アラブ圏</b>: 本人・父・祖父の名を連ねる。同じ人が複数の正当な形で名乗る。</li>
+  </ul>
+  <h4>日本にない構成要素がある</h4>
+  <ul>
+    <li><b>シンハラ系</b>: 家系名（gē名）＋名＋姓。家系名は頭文字にされたり省かれたりし、農村部では姓がないこともある。</li>
+    <li><b>シク教徒</b>: 名＋Singh／Kaur。姓は伝統的に使わない。</li>
+  </ul>
+  <h4>姓が2つ以上ある</h4>
+  <ul>
+    <li><b>スペイン語圏</b>: 父方と母方の2つの姓。</li>
+    <li><b>ブラジル</b>: 3〜4つの姓もある。並び順はスペイン語圏と逆。</li>
+  </ul>
+  <h4>制度も揺れている（インドネシア）</h4>
+  <ul>
+    <li>2022年の内務大臣令73号で、名前の登録基準は「最低2語・最大60字」になった。</li>
+    <li>ただし当局者は、1語でも本人が強く望めば認めると説明している。</li>
+    <li>2022年以前に登録された1語の名前は今も有効。</li>
+    <li>運用の実態は<b>未検証</b>（2025年の報道では「1語は不受理」とされている）。</li>
+  </ul>
+
+  <h3>人類の何割が「姓＋名」に収まるか（フェルミ推定）</h3>
+  <p>直接のデータは見つからなかった。人口は国連の世界人口推計2024年版の概数を使っている（出典は未取得）。</p>
+  <div class="tw"><table>
+    <thead><tr><th>定義</th><th>内容</th><th>推定</th><th>幅</th></tr></thead>
+    <tbody>
+      <tr><td>広義</td><td>世襲の姓があり、姓欄と名欄に分けられる</td><td><b>約80%（約65億人）</b></td><td class="no-wrap">75〜85%</td></tr>
+      <tr><td>狭義</td><td>日本型（姓1語＋名1語。ミドルネーム・複数の姓・父称なし）</td><td><b>約45%（約36億人）</b></td><td class="no-wrap">35〜55%</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>結果を最も大きく左右するのはインド（±2.7ポイント）とアフリカ（±2ポイント）。</li>
+    <li><b>日本型（狭義）の約4割は中国の人口</b>であり、日本型が多数派に見えるのは中国の人口の大きさによる。</li>
+    <li><b>広義で漏れる約2割（15〜17億人）は、インド一国の人口に匹敵する</b>。</li>
+  </ul>
+  <p>「姓を必須にする」という設計は、外れ値ではなく十数億人を相手にしている。</p>
+
+  <h2 class="act"><span><span class="act-n">3.2</span> 国際規格は2要素を前提にしていない</span></h2>
+  <h3>ICAO Doc 9303 Part 3（旅券。ISO/IEC 7501が参照）</h3>
+  <ul>
+    <li>名前は「姓／名」ではなく、<b>第一識別子／第二識別子</b>として定義されている。</li>
+    <li>名前を2つに分けられない場合は、<b>名前全体を第一識別子</b>とする。第二識別子は空でもよい。</li>
+    <li>目視欄（VIZ）は各国の文字のままで、機械読取欄（MRZ）はラテン大文字のみ。MRZは意図的に情報を落とした<b>派生表現</b>であり、MRZの名前はVIZと同じ形にならない場合がある。</li>
+    <li>MRZの名前は、規定の手順で切り詰める場合を除き切り詰めない。アポストロフィは削除し、ハイフンは区切り文字に置き換える。</li>
+    <li>敬称や称号は、法的に名前の一部でない限り載せない。</li>
+  </ul>
+  <h3>ISO/IEC 18013-5（モバイル運転免許証）</h3>
+  <ul>
+    <li><code>family_name</code> は「姓、名字、<b>または第一識別子</b>」と定義されている。</li>
+    <li>Unicode表記用の要素が別に用意されている。</li>
+    <li>いずれも二次情報による。ISO原文は有償のため未取得。</li>
+  </ul>
+  <p><b>読み取れること</b>: 規格は「原本の名前」と「用途ごとの派生表現」を分けて扱い、2要素への分割を必須にしていない。入力フォームが規格から借りるべきなのは、MRZのA–Zや39文字といった<b>制約ではなく、この構造</b>である。</p>
+  <h3>日本の制度</h3>
+  <p>2025年5月26日から、戸籍の記載事項に氏名のフリガナが加わった。読み仮名は公証される情報になった。</p>
+
+  <h2 class="act"><span><span class="act-n">3.3</span> 手本になるもの</span></h2>
+  <h3>設計の基準</h3>
+  <h4>GOV.UK Design System（英国政府）</h4>
+  <ul>
+    <li>1欄の「Full name」を例として示している。</li>
+    <li>数字や記号を含め、利用者が必要とする文字をすべて受け付けるよう求めている。</li>
+    <li>分割すると、名前がその形式に収まらない危険が増すと明記している。</li>
+    <li>名前の変更を容易にするよう求めている。</li>
+  </ul>
+  <h4>USWDS（米国政府）</h4>
+  <ul>
+    <li>各欄128文字まで受け付ける。1文字の名前も受け付ける。</li>
+    <li><b>どの欄も必須にしない</b>。インドネシアやアイスランドには1語の名前の人がいることを理由に挙げている。</li>
+    <li>大文字小文字を正規化しない。</li>
+    <li>「旧姓」ではなく「以前の名前」を尋ねる。</li>
+    <li>呼びかけ用の名前を別の欄で受け取る。</li>
+  </ul>
+  <h3>実サービス</h3>
+  <div class="tw"><table>
+    <thead><tr><th>サービス</th><th>良い点</th><th>限界</th></tr></thead>
+    <tbody>
+      <tr><td>Google</td><td>姓が任意。文字の制限が緩い</td><td>名は50文字まで</td></tr>
+      <tr><td>GitHub（表示用）</td><td>名前はName欄1つ。プロフィールの名前は実名と一致させる必要がないと明記</td><td>名前の入力は必須</td></tr>
+      <tr><td>Slack（表示用）</td><td>フルネーム（必須）と表示名（任意）の2層</td><td>予約語 <code>ja</code>／<code>ms</code></td></tr>
+      <tr><td>Wise（本人確認＝KYC あり）</td><td>法的な氏名と呼んでほしい名前を分離。改名は書類で変更。姓名の欄がないインドネシアやマレーシアの身分証明書にも対応</td><td><b>2語以上が条件</b>で、1語の名前は通らない</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>単独で満点のサービスは見つからなかった。</b>最も理想に近いのは次の組み合わせで、1章の結論の構造はこれを基にしている。</p>
+  <ul>
+    <li>骨格はUSWDS（必須欄なし、1欄128文字、正規化しない）</li>
+    <li>Wiseの「法的な氏名」と「呼び名」の2層構造</li>
+    <li>Wiseの「2語以上」条件は外す</li>
+    <li>本人確認をしない用途なら、GitHubのように実名との一致を求めない</li>
+  </ul>
+</section>
+
+<!-- ================================================================ -->
+<section class="part">
+  <h2 class="sec">まとめ</h2>
+  <div class="cta"><div>
+    <p class="cta-lead">「姓＋名」に収まらない人は、<em>例外ではなく十数億人</em>いる。</p>
+    <ul>
+      <li>国際規格すら2要素を前提にしておらず、「原本」と「派生表現」を分けて扱っている。</li>
+      <li>実サービスの多くは2要素を前提にしたまま、1語の名前を<b>裏技や人手の手続き</b>で吸収している。</li>
+      <li>対策は難しくない。<b>分割しない、必須にしない、書き換えない、文字を絞らない。</b></li>
+    </ul>
+  </div></div>
+</section>
+
+<!-- ================================================================ -->
+<section class="part refs" id="refs">
+  <h2 class="sec">参考資料</h2>
+  <h4>誤謬・国際化</h4>
+  <ul>
+    <li><a href="https://emptypage.jp/translations/kalzumeus/falsehoods-programmers-believe-about-names.html">McKenzie「プログラマの抱いている名前についての誤謬」（日本語訳）</a></li>
+    <li><a href="http://www.w3.org/International/questions/qa-personal-names">W3C「Personal names around the world」</a></li>
+  </ul>
+  <h4>規格</h4>
+  <ul>
+    <li><a href="https://icao.int/publications/Documents/9303_p3_cons_en.pdf">ICAO Doc 9303 Part 3</a></li>
+    <li><a href="https://learn.mattr.global/docs/issuance/credential-configuration/iso-compliant-credentials">ISO/IEC 18013-5の要素一覧（MATTRによる二次情報）</a></li>
+  </ul>
+  <h4>各国の名前・制度</h4>
+  <ul>
+    <li><a href="https://corpora.tika.apache.org/base/docs/govdocs1/650/650795.pdf">A Guide to Names and Naming Practices（英国政府作成、米政府文書コーパスにある写し）</a></li>
+    <li><a href="https://www.cnnindonesia.com/nasional/20220523175031-20-800220/aturan-baru-ktp-nama-minimal-dua-kata-dokumen-lama-tetap-berlaku">インドネシア内務大臣令73号の報道（CNN Indonesia）</a></li>
+    <li><a href="https://www.moj.go.jp/MINJI/furigana/index.html">法務省「戸籍にフリガナが記載されます」</a></li>
+  </ul>
+  <h4>デザインシステム</h4>
+  <ul>
+    <li><a href="https://design-system.service.gov.uk/patterns/names">GOV.UK Design System – Names</a></li>
+    <li><a href="https://designsystem.digital.gov/patterns/create-a-user-profile/name/">USWDS – Name</a></li>
+  </ul>
+  <h4>調査したサービス</h4>
+  <ul>
+    <li><a href="https://grp01.id.rakuten.co.jp/rms/nid/registfwd?service_id=top">楽天会員登録（旧フォーム）</a></li>
+    <li><a href="https://direct.jp-bank.japanpost.jp/tp1web/U530101WAK.do">ゆうちょダイレクト 新規利用申込み</a></li>
+    <li><a href="https://accounts.google.com/signup?hl=ja">Google アカウント作成</a></li>
+    <li><a href="https://www.facebook.com/r.php?locale=ja_JP">Facebook 登録フォーム</a></li>
+    <li><a href="https://www.facebook.com/help/112146705538576?locale=en_US">Facebook「Names allowed on Facebook」</a></li>
+    <li><a href="https://www.facebook.com/help/1624166354518070/?locale=en_US">Facebook「1語の名前しかない場合」</a></li>
+    <li><a href="https://account.apple.com/account">Apple Account作成</a></li>
+    <li><a href="https://docs.github.com/en/account-and-profile/tutorials/personalize-your-profile">GitHub Docs – Personalize your profile</a></li>
+    <li><a href="https://slack.com/help/articles/216360827-Change-your-display-name">Slack – Change your display name</a></li>
+    <li><a href="https://wise.com/help/articles/2949801">Wise – How does Wise verify my identity?</a></li>
+    <li><a href="https://wise.com/help/articles/2932128">Wise – How do I edit my personal details?</a></li>
+    <li><a href="https://www.pref.mie.lg.jp/SHOBO/HP/e_nameCollumn.htm">三重県 – 電子申請：氏名欄の入力方法</a></li>
+  </ul>
+  <h4>注記</h4>
+  <ul>
+    <li>各サービスの挙動は2026年10月時点の観察。主にクライアント側の検証メッセージを見たもので、サーバー側の最終判定は一部未検証。</li>
+    <li>フェルミ推定の人口は概数で、出典は未取得。</li>
+  </ul>
+</section>
+
+</main>
+
+<footer class="foot"><div class="wrap">
+  <p>松本幸太郎 · @CannotSwift</p>
+  <p class="dim">1つずつ進むインタラクティブ版は <a href="./">こちら</a>。</p>
+</div></footer>
+</body>
+</html>

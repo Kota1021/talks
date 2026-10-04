@@ -15,5 +15,5 @@ dont-call-it-modal/*
 !dont-call-it-modal/img/*.jpg
 !person-names/
 person-names/*
-!person-names/README.md
-!person-names/notes.md
+!person-names/index.html
+!person-names/static.html
