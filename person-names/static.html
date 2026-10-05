@@ -197,9 +197,10 @@ td.no-wrap{white-space:nowrap}
   <h2 class="act"><span>原則</span></h2>
   <p class="punch">名前は「本人が申告した原本の文字列」と「用途ごとに作る派生表現」の2層で扱う。</p>
   <ul>
-    <li>原本は分割せず、必須の構造も持たせず、書き換えない。</li>
-    <li>分割、読み、ローマ字表記、照合キー、外部システム向けの値は、すべて原本とは別に持つ派生表現とする。</li>
-    <li>これは国際規格（ICAO Doc 9303）が採っている構造そのものである。旅券は、各国の文字で書いた目視欄（VIZ）を原本とし、機械読取欄（MRZ）を意図的に情報を落とした派生表現として扱う。</li>
+    <li><b>正式な氏名（原本）</b>は1欄で受け取り、入力されたまま保存する。どの文字も、長い名前も受け付ける。</li>
+    <li><b>用途ごとの名前</b>（読み、呼び名、ローマ字表記、姓と名の分割）は原本とは別の欄で、使う場面があるときだけ本人に尋ねる。無い人もいるので空欄を許す。</li>
+    <li>照合キーや外部システム向けの値は、原本から機械的に作る派生表現として別に持ち、原本には書き戻さない。</li>
+    <li>これは国際規格（ICAO Doc 9303）が採っている構造そのものである。旅券は、各国の文字で書いた目視欄（VIZ）を原本とし、機械読取欄（MRZ：顔写真ページ下端の、空港の読取機が OCR で読む2行）を意図的に情報を落とした派生表現として扱う。</li>
   </ul>
 
   <h2 class="act"><span>データ構造</span></h2>
@@ -235,7 +236,7 @@ td.no-wrap{white-space:nowrap}
       <tr><td class="n">8</td><td>照合用の正規化は派生キーとして作り、原本は書き換えない。NFCでもCJK互換漢字は別の字に置き換わる</td><td class="no-wrap">誤謬#38</td></tr>
       <tr><td class="n">9</td><td>名前を一意キーや同一人物の判定に使わない</td><td class="no-wrap">誤謬#21〜#23</td></tr>
       <tr><td class="n">10</td><td>変更履歴と複数の名前を持てるようにし、ラベルは「旧姓」ではなく「以前の氏名」にする</td><td class="no-wrap">USWDS、W3C</td></tr>
-      <tr><td class="n">11</td><td>「お呼びする名前」の欄を別に設ける</td><td class="no-wrap">USWDS、W3C</td></tr>
+      <tr><td class="n">11</td><td>「お呼びする名前」の欄を別に設ける（<a href="#address">呼びかけに使う名前</a>）</td><td class="no-wrap">USWDS、W3C</td></tr>
       <tr><td class="n">12</td><td>並べ替えのキーは本人の入力か、ロケールの規則に従う</td><td class="no-wrap">W3C</td></tr>
       <tr><td class="n">13</td><td>本名の欄に不適切語フィルタをかけず、1文字の名前も拒否しない</td><td class="no-wrap">USWDS、誤謬#31</td></tr>
       <tr><td class="n">14</td><td>外部連携用の値は明示的な規則で派生させ、別に保存する。本人に確認・編集してもらう</td><td class="no-wrap">ICAO（MRZの生成規則）</td></tr>
@@ -244,7 +245,7 @@ td.no-wrap{white-space:nowrap}
   </table></div>
 
   <h2 class="act"><span>一言でいうと</span></h2>
-  <p class="punch">分割しない、必須にしない、書き換えない、文字を絞らない。</p>
+  <p class="punch">正式な氏名は、1欄で受け取る。どの文字も、長い名前も、入力されたまま保存する。<br>用途ごとの名前は、用途があるときだけ、別の欄で尋ねる。</p>
 </section>
 
 <!-- ================================================================ -->
@@ -303,18 +304,18 @@ td.no-wrap{white-space:nowrap}
   </div></article>
 
   <article class="find"><div class="no">AP3</div><div class="body">
-    <h3>エラーを出さずに書き換える</h3>
+    <h3>勝手に書き換える</h3>
     <h4>楽天（旧フォーム）</h4>
     <div class="rw">
-      <div><span class="del">山&lt;田</span><span class="arr">→</span><span class="add">山</span>　<i>（<code>&lt;</code> 以降が消える）</i></div>
+      <div><span class="del">山&lt;田</span><span class="arr">→</span><span class="add">山</span>　<i>（記号の扱いを確かめるテスト入力。<code>&lt;</code> 以降が消える）</i></div>
       <div><span class="del">デ ラ トーレ</span><span class="arr">→</span><span class="add">デラトーレ</span>　<i>（スペースが消える）</i></div>
       <div><span class="del">ひらがな・半角カナ</span><span class="arr">→</span><span class="add">全角カタカナ</span></div>
     </div>
-    <p>最も危険な類型。本人が知らないうちに原本が変わり、後の照合失敗の原因になる。</p>
+    <p>本人が知らないうちに原本が変わり、後の照合失敗の原因になる。</p>
   </div></article>
 
   <article class="find"><div class="no">AP4</div><div class="body">
-    <h3>「名前らしさ」を推定で判定する</h3>
+    <h3>実在する名前を「名前ではない」と拒否する</h3>
     <h4>Facebook</h4>
     <div class="tw"><table>
       <thead><tr><th>入力</th><th>結果</th></tr></thead>
@@ -349,9 +350,9 @@ td.no-wrap{white-space:nowrap}
   </div></article>
 
   <article class="find"><div class="no">AP6</div><div class="body">
-    <h3>制約を利用者の運用で吸収させる</h3>
+    <h3>システムに合わせて、名前を崩して入力させる</h3>
     <h4>三重県 e-TUMO apply（電子申請）</h4>
-    <p>システムの制約を回避するため、県は利用者に次のように案内している。</p>
+    <p>三重県は、県への申請・届出をオンラインで受け付ける電子申請システムの公式ページで、氏名欄の入力方法を次のように案内している。</p>
     <ul>
       <li>読みをカナで表せない場合は、「氏」に"シ"、「名」に"メイ"と入力する。</li>
       <li>姓が後ろに来る文化の名前は、名を「氏」の欄に、姓を「名」の欄に入れる。<br>
@@ -373,7 +374,7 @@ td.no-wrap{white-space:nowrap}
   <ol>
     <li><b>姓を必須にするかどうかは、照合キーの設計で決まっている。</b>表示用の名前を扱うGoogleは姓を任意にし、身元照合を重視するFacebook・楽天・Appleは姓と名を両方必須にしている。1語の名前は「同じ語を両方の欄に入れる」という<b>裏技</b>で扱われている。</li>
     <li><b>国産サービスは文字セットが狭い。</b>楽天はJIS X 0208相当、ゆうちょはカタカナ中心。</li>
-    <li><b>黙った書き換えが最も危険。</b>本人が知らないうちに原本が変わり、後で照合に失敗する原因になる。</li>
+    <li><b>黙って書き換えると、本人が気づけない。</b>知らないうちに原本が変わり、後で照合に失敗する原因になる。</li>
     <li><b>推定による判定は、正当な名前を誤って拒否する。</b>Facebookの <code>Zoë</code> が例。</li>
   </ol>
 </section>
@@ -433,8 +434,21 @@ td.no-wrap{white-space:nowrap}
     <li>運用の実態は<b>未検証</b>（2025年の報道では「1語は不受理」とされている）。</li>
   </ul>
 
+  <h3 id="address">呼びかけに使う名前</h3>
+  <p>正式な氏名で呼ぶのが失礼になる文化がある。呼びかけに使う名前は正式な氏名から作らず、別の欄で本人に尋ねる。W3C も「What should we call you?」を別に尋ねる例を挙げている。</p>
+  <div class="tw"><table>
+    <thead><tr><th>文化</th><th>呼びかけの慣習</th></tr></thead>
+    <tbody>
+      <tr><td>韓国</td><td>目上の人を名前で呼ぶのは失礼とされる。肩書き（선생님 など）や親族呼称で呼ぶ</td></tr>
+      <tr><td>タイ</td><td>日常は本名と無関係なことが多いニックネームで呼び合う</td></tr>
+      <tr><td>英国</td><td>初対面で名（given name）を使うと、以前に会ったことがあるような含みになる場合がある</td></tr>
+      <tr><td>中国・日本（歴史）</td><td>実名（諱）を口にするのは、はばかられた。字（あざな）や通称で呼んだ</td></tr>
+    </tbody>
+  </table></div>
+  <p>出典は W3C「Personal names around the world」（タイ・英国）、コトバンク「諱」（山川 日本史小辞典）、Korea Atlas「Addressing People in Korea」（解説サイトによる二次情報）。</p>
+
   <h3>人類の何割が「姓＋名」に収まるか（フェルミ推定）</h3>
-  <p>直接のデータは見つからなかった。人口は国連の世界人口推計2024年版の概数を使っている（出典は未取得）。</p>
+  <p>直接のデータは見つからなかった。人口は国連「World Population Prospects 2024: Summary of Results」表A2の値を使っている（2024年1月1日時点。世界 8,126,964千人、インド 1,444,436千人、中国 1,420,909千人）。</p>
   <div class="tw"><table>
     <thead><tr><th>定義</th><th>内容</th><th>推定</th><th>幅</th></tr></thead>
     <tbody>
@@ -454,7 +468,7 @@ td.no-wrap{white-space:nowrap}
   <ul>
     <li>名前は「姓／名」ではなく、<b>第一識別子／第二識別子</b>として定義されている。</li>
     <li>名前を2つに分けられない場合は、<b>名前全体を第一識別子</b>とする。第二識別子は空でもよい。</li>
-    <li>目視欄（VIZ）は各国の文字のままで、機械読取欄（MRZ）はラテン大文字のみ。MRZは意図的に情報を落とした<b>派生表現</b>であり、MRZの名前はVIZと同じ形にならない場合がある。</li>
+    <li>目視欄（VIZ）は各国の文字のままで、機械読取欄（MRZ：顔写真ページ下端の、空港の読取機が OCR で読む2行）はラテン大文字・数字・<code>&lt;</code> のみ。MRZは意図的に情報を落とした<b>派生表現</b>であり、MRZの名前はVIZと同じ形にならない場合がある。</li>
     <li>MRZの名前は、規定の手順で切り詰める場合を除き切り詰めない。アポストロフィは削除し、ハイフンは区切り文字に置き換える。</li>
     <li>敬称や称号は、法的に名前の一部でない限り載せない。</li>
   </ul>
@@ -510,9 +524,9 @@ td.no-wrap{white-space:nowrap}
   <div class="cta"><div>
     <p class="cta-lead">「姓＋名」に収まらない人は、<em>例外ではなく十数億人</em>いる。</p>
     <ul>
-      <li>国際規格すら2要素を前提にしておらず、「原本」と「派生表現」を分けて扱っている。</li>
+      <li>世界中の人の名前を扱う国際規格（旅券）は2要素を前提にしておらず、「原本」と「派生表現」を分けて扱っている。</li>
       <li>実サービスの多くは2要素を前提にしたまま、1語の名前を<b>裏技や人手の手続き</b>で吸収している。</li>
-      <li>対策は難しくない。<b>分割しない、必須にしない、書き換えない、文字を絞らない。</b></li>
+      <li>対策は難しくない。<b>正式な氏名は、1欄で受け取る。どの文字も、長い名前も、入力されたまま保存する。用途ごとの名前は、用途があるときだけ、別の欄で尋ねる。</b></li>
     </ul>
   </div></div>
 </section>
@@ -535,6 +549,9 @@ td.no-wrap{white-space:nowrap}
     <li><a href="https://corpora.tika.apache.org/base/docs/govdocs1/650/650795.pdf">A Guide to Names and Naming Practices（英国政府作成、米政府文書コーパスにある写し）</a></li>
     <li><a href="https://www.cnnindonesia.com/nasional/20220523175031-20-800220/aturan-baru-ktp-nama-minimal-dua-kata-dokumen-lama-tetap-berlaku">インドネシア内務大臣令73号の報道（CNN Indonesia）</a></li>
     <li><a href="https://www.moj.go.jp/MINJI/furigana/index.html">法務省「戸籍にフリガナが記載されます」</a></li>
+    <li><a href="https://kotobank.jp/word/%E8%AB%B1-435964">コトバンク「諱」</a></li>
+    <li><a href="https://koreaatlas.com/addressing-people-in-korea/">Korea Atlas「Addressing People in Korea」</a></li>
+    <li><a href="https://population.un.org/wpp/assets/Files/WPP2024_Summary-of-Results.pdf">United Nations, World Population Prospects 2024: Summary of Results（UN DESA/POP/2024/TR/NO. 9）</a></li>
   </ul>
   <h4>デザインシステム</h4>
   <ul>
@@ -559,7 +576,7 @@ td.no-wrap{white-space:nowrap}
   <h4>注記</h4>
   <ul>
     <li>各サービスの挙動は2026年10月時点の観察。主にクライアント側の検証メッセージを見たもので、サーバー側の最終判定は一部未検証。</li>
-    <li>フェルミ推定の人口は概数で、出典は未取得。</li>
+    <li>フェルミ推定の人口は国連「World Population Prospects 2024: Summary of Results」表A2による。各国の名前の構造の割合は推定で、直接のデータではない。</li>
   </ul>
 </section>
 

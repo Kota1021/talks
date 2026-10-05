@@ -16,7 +16,6 @@
   --fix:#2C7355; --fix-soft:rgba(44,115,85,.10); --amber:#9A6B12;
   --mono:'IBM Plex Mono','Zen Kaku Gothic New',ui-monospace,monospace;
   --sans:'Zen Kaku Gothic New',system-ui,sans-serif;
-  --rail:min(30rem,34vw);
   --dur:.34s;
 }
 @media (prefers-color-scheme:dark){
@@ -49,9 +48,7 @@ body{
   border-bottom:1px solid var(--rule);
   font-family:var(--mono); font-size:clamp(.72rem,1vw,.9rem);
   letter-spacing:.14em; text-transform:uppercase;
-  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
 }
-body.open .top,body.open .bottom{padding-right:calc(var(--rail) + clamp(1rem,3vw,2.6rem))}
 .act{color:var(--dim); transition:color var(--dur)}
 .act b{color:var(--ink); font-weight:600; letter-spacing:.1em}
 .count{color:var(--faint); font-variant-numeric:tabular-nums; white-space:nowrap}
@@ -61,114 +58,18 @@ body.open .top,body.open .bottom{padding-right:calc(var(--rail) + clamp(1rem,3vw
 .stage{
   display:grid; place-items:center; overflow:hidden;
   padding:clamp(1rem,3vh,2.4rem) clamp(1rem,3vw,3rem);
-  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
-  grid-template-areas:"a"; position:relative;
 }
-.stage>*{grid-area:a}
-body.open .stage{padding-right:calc(var(--rail) + clamp(1rem,3vw,3rem))}
 
-/* ---------- the form — the thing under review ---------- */
-.form{
-  width:min(36rem,100%); font-size:clamp(13px,1.35vw,24px);
-  background:var(--surface); border:1px solid var(--rule); border-radius:14px;
-  padding:1.5em 1.7em 1.4em;
-}
-.fhead{display:flex; align-items:baseline; justify-content:space-between; gap:1em; margin-bottom:1.1em}
-.svc{font-family:var(--mono); font-size:.62em; letter-spacing:.16em; text-transform:uppercase; color:var(--faint)}
-.ftitle{font-weight:900; font-size:1.05em}
-.who{
-  font-family:var(--mono); font-size:.62em; letter-spacing:.08em; color:var(--dim);
-  border:1px solid var(--rule); border-radius:999px; padding:.25em .9em; white-space:nowrap;
-}
-.row{display:grid; grid-template-columns:minmax(4.6em,max-content) 1fr; align-items:start; gap:.4em .9em; margin-top:.75em}
-.row label{padding-top:.55em; font-weight:700; font-size:.86em; white-space:nowrap}
-.req{
-  display:inline-block; margin-left:.4em; font-size:.66em; font-weight:700; color:var(--flag);
-  letter-spacing:.06em; vertical-align:.12em;
-}
-.inp{
-  min-height:2.3em; padding:.38em .7em; border:1.5px solid var(--rule); border-radius:7px;
-  background:var(--ground); font-size:.98em; line-height:1.45; overflow-wrap:anywhere;
-  transition:border-color var(--dur),background var(--dur);
-}
-.inp.empty::after{content:'\00a0'}
 @keyframes blink{50%{opacity:0}}
-.fmsg{grid-column:2; font-size:.7em; font-weight:700; letter-spacing:.04em; margin-top:-.1em}
-.row.err .inp{border-color:var(--flag); background:var(--flag-soft)}
-.row.err .fmsg{color:var(--flag)}
-.row.ok .inp{border-color:var(--fix)}
-.row.ok .fmsg{color:var(--fix)}
-.row.rw .inp{border-color:var(--amber)}
-.row.rw .fmsg{color:var(--amber)}
-.rw-was{color:var(--flag); text-decoration:line-through; opacity:.7}
-.rw-arr{color:var(--faint); padding:0 .45em; font-family:var(--mono)}
-.row.ghost label{color:var(--flag); font-weight:500; font-size:.76em}
-.row.ghost .inp{border:1.5px dashed var(--flag-line); background:transparent; color:var(--flag)}
-.row.ghost .fmsg{color:var(--flag)}
-.submit{
-  margin-top:1.3em; display:flex; align-items:center; justify-content:space-between; gap:1em;
-  padding-top:1.05em; border-top:1px solid var(--rule);
-}
-.btn{
-  font-weight:700; font-size:.82em; color:var(--surface); background:var(--ink);
-  border-radius:7px; padding:.45em 1.4em; white-space:nowrap;
-}
-.verdict{font-weight:700; font-size:.8em}
-.verdict.err{color:var(--flag)}
-.verdict.ok{color:var(--fix)}
-.form.hit .verdict{animation:rise var(--dur) cubic-bezier(.2,.7,.3,1) both}
-
-/* ---------- rail ---------- */
-.rail{
-  position:fixed; z-index:4; top:0; right:0; bottom:0; width:var(--rail);
-  background:var(--surface); border-left:1px solid var(--rule);
-  padding:clamp(1.4rem,3.4vh,2.6rem) clamp(1.2rem,2vw,2rem);
-  display:flex; flex-direction:column; gap:1.15rem; overflow-y:auto;
-  transform:translateX(101%); transition:transform var(--dur) cubic-bezier(.4,0,.2,1);
-}
-body.open .rail{transform:none}
-
-.no{
-  font-family:var(--mono); font-size:clamp(2.4rem,4.4vw,3.9rem); line-height:.9;
-  font-weight:600; color:var(--flag); font-variant-numeric:tabular-nums;
-}
-.wait{font-size:clamp(2.4rem,4.4vw,3.9rem); line-height:.9; font-weight:900; color:var(--rule)}
-.label{
-  font-size:clamp(1.1rem,1.9vw,1.75rem); font-weight:700; line-height:1.42;
-  text-wrap:balance;
-}
-.punch{
-  font-size:clamp(1rem,1.65vw,1.5rem); font-weight:500; line-height:1.6;
-  color:var(--flag); text-wrap:balance;
-  border-left:3px solid var(--flag); padding-left:.85em;
-}
-.note{font-size:clamp(.86rem,1.12vw,1.06rem); line-height:1.85; color:var(--dim); max-width:34em}
-.note b{color:var(--ink)}
-.fix{
-  font-family:var(--mono); font-size:clamp(.7rem,.94vw,.92rem); line-height:1.75;
-  background:var(--ground); border:1px solid var(--rule); border-radius:5px;
-  padding:.85em 1em; white-space:pre-wrap; word-break:break-word;
-}
-.fix .add{color:var(--fix); display:block}
-.src{
-  margin-top:auto; padding-top:1rem; border-top:1px solid var(--rule);
-  font-size:clamp(.68rem,.86vw,.82rem); line-height:1.7; color:var(--faint);
-}
-.reveal>*{animation:rise var(--dur) cubic-bezier(.2,.7,.3,1) both}
-.reveal>*:nth-child(2){animation-delay:.05s}
-.reveal>*:nth-child(3){animation-delay:.1s}
-.reveal>*:nth-child(4){animation-delay:.14s}
 @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 
-/* ---------- ticks ---------- */
+/* ---------- progress ---------- */
 .bottom{
   display:flex; align-items:center; gap:clamp(1rem,2.4vw,2rem);
   padding:.45rem clamp(1rem,3vw,2.6rem) .5rem; border-top:1px solid var(--rule);
-  transition:padding-right var(--dur) cubic-bezier(.4,0,.2,1);
 }
 .ticks{display:flex; gap:4px; flex:1 1 auto; min-width:2rem}
 .tk{flex:1; height:3px; border-radius:2px; background:var(--rule); transition:background .22s}
-.tk.on{background:var(--flag-line)}
 .tk.done{background:var(--flag)}
 .hint{
   font-family:var(--mono); font-size:clamp(.62rem,.8vw,.76rem);
@@ -181,9 +82,7 @@ kbd{
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 /* ---------- full pages ---------- */
-.page{display:none; text-align:center; max-width:min(78rem,94vw)}
-body.is-page .form{display:none}
-body.is-page .page{display:block}
+.page{text-align:center; max-width:min(78rem,94vw)}
 body.is-cover .top{visibility:hidden}
 body.is-cover .ticks,body.is-cover .hint{visibility:hidden}
 .page>*{animation:rise var(--dur) cubic-bezier(.2,.7,.3,1) both}
@@ -221,6 +120,7 @@ body.is-cover .ticks,body.is-cover .hint{visibility:hidden}
 .big em{font-style:normal; color:var(--flag)}
 .lead{margin-top:.8rem; font-size:clamp(.95rem,1.5vw,1.35rem); color:var(--dim); text-wrap:balance}
 .lead b{color:var(--ink)}
+.lead.rule-lead{margin-bottom:clamp(1rem,2.6vh,2rem)}
 
 /* intro: the falsehoods */
 .falses{
@@ -298,13 +198,47 @@ body.is-cover .ticks,body.is-cover .hint{visibility:hidden}
 
 /* slogan */
 .four{
-  list-style:none; display:grid; grid-template-columns:repeat(2,auto); justify-content:center;
+  list-style:none; display:grid; grid-template-columns:auto; justify-content:center;
   gap:clamp(.6rem,1.6vh,1.2rem) clamp(1.6rem,4vw,3.6rem); margin-top:clamp(1.2rem,3vh,2.2rem);
-  font-size:clamp(1.6rem,4vw,3.6rem); font-weight:900; line-height:1.3; text-align:left;
+  font-size:clamp(1.05rem,2.2vw,1.9rem); font-weight:900; line-height:1.35; text-align:left;
 }
 .four{counter-reset:four}
 .four li{counter-increment:four}
 .four li::before{content:counter(four,decimal-leading-zero); color:var(--flag); font-family:var(--mono); font-weight:600; margin-right:.5em; font-size:.5em; vertical-align:.35em}
+
+.layers{display:flex; justify-content:center; gap:clamp(1.6rem,4vw,4rem); margin-top:clamp(1.2rem,3vh,2.2rem); text-align:left; flex-wrap:wrap}
+.layers .four{margin-top:.5em}
+.lname{font-weight:900; font-size:clamp(.9rem,1.4vw,1.25rem); color:var(--dim); border-bottom:2px solid var(--rule); padding-bottom:.3em}
+.lname i{font-style:normal; font-weight:500; margin-left:.8em; font-size:.8em; color:var(--faint)}
+
+/* counterexamples */
+.names{
+  list-style:none; margin:clamp(1.2rem,3vh,2rem) auto 0; width:min(66rem,92vw);
+  display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(.5rem,1.2vw,.9rem); text-align:left;
+}
+.names li{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:.8em 1em; display:flex; flex-direction:column; gap:.25em}
+.names b{font-size:clamp(.9rem,1.5vw,1.35rem); font-weight:900; overflow-wrap:anywhere}
+.names span{font-family:var(--mono); font-size:clamp(.6rem,.82vw,.76rem); letter-spacing:.1em; color:var(--faint)}
+.names i{font-style:normal; font-size:clamp(.7rem,.95vw,.9rem); color:var(--flag)}
+.names.addr i{color:var(--ink); font-size:clamp(.8rem,1.1vw,1.05rem); line-height:1.6}
+.names.addr span{color:var(--flag); font-weight:600}
+@media (max-width:700px){.names{grid-template-columns:1fr 1fr}}
+
+/* real services */
+.svcs{
+  list-style:none; margin:clamp(1.2rem,3vh,2rem) auto 0; width:min(66rem,92vw);
+  display:grid; grid-template-columns:1fr 1fr; gap:clamp(.6rem,1.4vw,1rem); text-align:left;
+}
+.svcs li{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:.85em 1.1em; display:flex; flex-direction:column; gap:.35em}
+.svcs .sv{display:flex; justify-content:space-between; font-family:var(--mono); font-size:clamp(.62rem,.85vw,.8rem); letter-spacing:.1em; color:var(--faint)}
+.svcs .in{font-size:clamp(1rem,1.7vw,1.5rem); font-weight:900; overflow-wrap:anywhere; padding:.2em .5em; border-radius:6px; border:1.5px solid var(--flag); background:var(--flag-soft)}
+.svcs li.rw .in{border-color:var(--amber); background:transparent}
+.svcs s{color:var(--flag); opacity:.7}
+.svcs .in i{font-style:normal; color:var(--faint); padding:0 .4em; font-family:var(--mono)}
+.svcs .ms{font-size:clamp(.72rem,1vw,.95rem); font-weight:700; color:var(--flag)}
+.svcs li.rw .ms{color:var(--amber)}
+.svcs .ex{font-size:clamp(.68rem,.9vw,.86rem); color:var(--dim); line-height:1.6}
+@media (max-width:700px){.svcs{grid-template-columns:1fr}}
 
 /* outro */
 .qrow{
@@ -354,12 +288,11 @@ body.is-outro .stamp{visibility:hidden}
 
 <header class="top">
   <div class="act" id="act">Personal names &nbsp;/&nbsp; <b>姓＋名</b></div>
-  <div class="count" id="count">事例 <b>00</b> / 12</div>
+  <div class="count" id="count"></div>
 </header>
 
-<main class="stage"><div class="form" id="form"></div><section class="page" id="page"></section></main>
+<main class="stage"><section class="page" id="page"></section></main>
 
-<aside class="rail" id="rail"></aside>
 
 <footer class="bottom">
   <div class="ticks" id="ticks"></div>
@@ -371,109 +304,16 @@ body.is-outro .stamp{visibility:hidden}
 </footer>
 
 <script>
-/* ============ the 12 cases. 各事例はフォーム1枚の状態として書く ============ */
-const A1=['第1幕','世界の名前'],
-      A2=['第3幕','実サービス'];
-/* fields: l=ラベル, v=入力値, st=err|ok|rw|ghost, m=欄の下のメッセージ, was=書き換え前 */
-const GENERIC = '会員登録';
-const F = [
- {act:A1, svc:'よくあるフォーム', who:'インドネシア',
-  fields:[{l:'姓',req:1,v:'',st:'err',m:'姓を入力してください'},{l:'名',req:1,v:'Sukarno'}],
-  verdict:['err','登録できません'],
-  label:'姓が無い',
-  punch:'「スカルノ大統領は、姓の欄に何を書けばいいですか。」',
-  note:'インドネシアでは多くの人に姓がなく、<b>1語だけの名前</b>もある（スカルノ、スハルト）。旅券にも姓名の区別がない。ミャンマー、タミル系、ソマリア、アフガニスタンも、伝統的に姓を持たない。',
-  src:'W3C「Personal names around the world」、英国政府の命名慣習ガイド（2006）'},
-
- {act:A1, svc:'よくあるフォーム', who:'ミャンマー',
-  fields:[{l:'姓',req:1,v:'Aung San Suu Kyi'},{l:'名',req:1,v:'',st:'err',m:'名を入力してください'}],
-  verdict:['err','登録できません'],
-  label:'どこで切っても間違い',
-  punch:'「Aung San が姓ですか？ Suu Kyi が名ですか？」',
-  note:'ミャンマーには姓の伝統がなく、<b>名前全体が1つの個人名</b>。どこで2つに切っても、存在しない「姓」を作ることになる。「U」のような敬称が名前と一体化して使われることもある。',
-  src:'W3C「Personal names around the world」'},
-
- {act:A1, svc:'よくあるフォーム', who:'タミル系',
-  fields:[{l:'姓',req:1,v:'A.',st:'ok'},{l:'名',req:1,v:'Rasiah',st:'ok'}],
-  verdict:['ok','登録できました'],
-  label:'通ったが、姓の欄に入ったのは父の名',
-  punch:'「"A." は姓ではありません。お父さんの名前の頭文字です。」',
-  note:'スリランカや南インドのタミル系は「<b>父の名＋本人の名</b>」で、父の名は頭文字にされることが多い。ソマリアは「本人＋父＋祖父」の3つで、3つ揃って初めて本人を特定できる。',
-  src:'英国政府の命名慣習ガイド（2006）'},
-
- {act:A1, svc:'よくあるフォーム', who:'アイスランド',
-  fields:[{l:'姓',req:1,v:'Jónsdóttir',st:'ok'},{l:'名',req:1,v:'Guðrún',st:'ok'}],
-  verdict:['ok','登録できました'],
-  label:'姓に見えるが、父称',
-  punch:'「お父さんは Jón Einarsson さんです。家族で同じ"姓"の人はいません。」',
-  note:'アイスランドは<b>父の名＋-son／-dóttir</b>。電話帳も名で並ぶ。マレーシアの Isa bin Osman、アラブ圏の「本人・父・祖父」も同型で、姓から家族関係を推定することはできない（誤謬 #18）。',
-  src:'W3C「Personal names around the world」'},
-
- {act:A1, svc:'よくあるフォーム', who:'シンハラ系',
-  fields:[{l:'家系名',v:'Kaluhandhilage',st:'ghost',m:'← 入る欄が無い'},{l:'姓',req:1,v:'SILVA',st:'ok'},{l:'名',req:1,v:'Hemachandra',st:'ok'}],
-  verdict:['ok','登録できました'],
-  label:'3つ目の要素の行き場が無い',
-  punch:'「家系名は、どこに書けばいいですか。」',
-  note:'シンハラ系は<b>家系名（gē名）＋名＋姓</b>。家系名は頭文字にされたり省かれたりし、農村部では姓がないこともある。スペイン語圏は姓が2つ、ブラジルは3〜4つで並び順も逆。シク教徒は名＋Singh／Kaur で、姓を伝統的に使わない。',
-  src:'英国政府の命名慣習ガイド（2006）、W3C'},
-
- {act:A2, svc:'楽天（旧フォーム）', who:'インドネシア',
-  fields:[{l:'姓',req:1,v:'Sukarno',st:'ok'},{l:'名',req:1,v:'Sukarno',st:'ok'}],
-  verdict:['ok','通りました'],
-  label:'1語の名前を「同じ語を2回」で通す',
-  punch:'「スカルノ・スカルノさんとして登録されました。」',
-  note:'楽天は姓だけ・名だけを拒否し、<b>同じ語を両方に入れると通る</b>。Facebook は1語の名前をフォームの外で申請させ、そこでも「同じ名前を両方の欄に」と案内している。Apple も両方必須。',
-  src:'2026年10月の観察（Playwright でダミー値を入力。登録は確定させていない）'},
-
- {act:A2, svc:'楽天（旧フォーム）', who:'日本',
-  fields:[{l:'姓',req:1,v:'髙橋',st:'err',m:'登録できない文字があります'},{l:'名',req:1,v:'一郎'}],
-  verdict:['err','登録できません'],
-  label:'文字の範囲が JIS X 0208',
-  punch:'「日本の会員登録で、日本人の名前が通りません。」',
-  note:'ü・ë、異体字（髙、𠮷）、互換漢字（﨑）、ハングル、簡体字、アラビア文字、ミャンマー文字、シンハラ文字、絵文字、丸数字を拒否。キリル文字と <code>O\'Brien-Smith</code> は通る。ゆうちょダイレクトは氏名がカナ1欄で、中黒「・」も拒否される。',
-  src:'2026年10月の観察。境界が JIS X 0208 と一致するので、制約はバックエンド側にあると推測'},
-
- {act:A2, svc:'楽天（旧フォーム）', who:'スペイン語圏',
-  fields:[{l:'姓（カナ）',req:1,v:'デラトーレ',was:'デ ラ トーレ',st:'rw',m:'エラーは出ない'},{l:'名（カナ）',req:1,v:'マリア'}],
-  verdict:['ok','登録できました'],
-  label:'エラーを出さずに書き換える',
-  punch:'「エラーは出ません。スペースが消えただけです。」',
-  note:'<code>山&lt;田</code> は <code>山</code> に（<code>&lt;</code> 以降が消える）、ひらがな・半角カナは全角カタカナに。<b>最も危険な類型</b>。本人が知らないうちに原本が変わり、後の照合失敗の原因になる。',
-  src:'2026年10月の観察'},
-
- {act:A2, svc:'Facebook', who:'ドイツ・英国',
-  fields:[{l:'姓',req:1,v:'Müller',st:'ok'},{l:'名',req:1,v:'Zoë',st:'err',m:'「タイトルまたはシンボル」扱い'}],
-  verdict:['err','登録できません'],
-  label:'「名前らしさ」を推定で判定する',
-  punch:'「Müller は通って、Zoë は通りません。」',
-  note:'<code>mcDONALD</code> は大文字が多すぎ、<code>Dr. Smith</code> はピリオドが多すぎ、<code>Pablo Diego Jose Francisco de Paula Juan</code> は「有名人と同じ名前」で拒否。シンハラ文字も拒否。Slack は予約語に <code>ja</code> があり、Ja さんは使えない。',
-  src:'2026年10月の観察。サーバー側の最終審査は未検証'},
-
- {act:A2, svc:'Apple', who:'スペイン',
-  fields:[{l:'姓',req:1,v:'Ruiz Picasso'},{l:'名',req:1,v:'Pablo Diego José Francisco de Paula Juan Nepomuceno',st:'err',m:'32文字まで'}],
-  verdict:['err','登録できません'],
-  label:'長さの上限が小さい',
-  punch:'「ピカソの名は、名の欄に入りません。」',
-  note:'上限は Apple が名32文字、Google が名50文字、楽天が各欄85文字、ゆうちょが30文字。USWDS が推奨する<b>1欄128文字</b>に対して、どれも小さい。',
-  src:'2026年10月の観察。Apple は CAPTCHA のため送信しておらず、サーバー側の判定は未検証'},
-
- {act:A2, svc:'三重県 電子申請', who:'米国',
-  fields:[{l:'氏',req:1,v:'John',st:'rw',m:'名を「氏」に入れるよう案内'},{l:'名',req:1,v:'Fitzgerald Kennedy',st:'rw'},{l:'氏（カナ）',req:1,v:'シ',st:'rw',m:'読めない場合は"シ"と"メイ"'},{l:'名（カナ）',req:1,v:'メイ',st:'rw'}],
-  verdict:['ok','県の案内どおりの入力'],
-  label:'制約を利用者の運用で吸収させる',
-  punch:'「この人の"氏"は、John です。」',
-  note:'システムの制約を回避するため、県が利用者に入力方法を案内している。姓が後ろに来る文化の名前は名を「氏」の欄に、読みをカナで表せなければ「シ」「メイ」と入れる。<b>保存されるデータの意味が壊れる。</b>',
-  src:'三重県「電子申請：氏名欄の入力方法」'},
-
- {act:A2, svc:'Google', who:'インドネシア',
-  fields:[{l:'姓（省略可）',v:'',st:'ok'},{l:'名',v:'Sukarno',st:'ok'}],
-  verdict:['ok','次へ進めます'],
-  label:'姓を任意にするだけで通る',
-  punch:'「Sukarno さんは、そのまま登録できます。」',
-  note:'Google は姓が任意。<code>Zoë</code>、<code>𠮷</code>、ハングル、アラビア文字、ミャンマー文字、シンハラ文字、1文字の名前も通る。拒否されたのは <code>&lt;</code>、絵文字、URL風の文字列、空白のみ、51文字以上。',
-  src:'2026年10月の観察'},
-];
-
+/* ============ 結論（3つ）。正式な氏名と用途ごとの名前の2層 ============ */
+const L = {
+  orig:{t:'正式な氏名', d:'原本'},
+  use: {t:'用途ごとの名前', d:'読み・呼び名・ローマ字・姓と名の分割'},
+};
+const R = [
+  {no:'01', ly:L.orig, t:'1欄で受け取る',            lead:'名前全体を1つの値として受け取る。<br>姓と名に分けさせると、こうなる。'},
+  {no:'02', ly:L.orig, t:'どの文字も、長い名前も、入力されたまま保存する', lead:'Unicode を全面的に受け付け、上限は十分に大きく取る。<br>照合用に正規化した値は別に作り、原本と並べて持つ。'},
+  {no:'03', ly:L.use,  t:'用途があるときだけ、別の欄で尋ねる', lead:'読み・呼び名・ローマ字・姓と名の分割は、使う場面があるときだけ本人に入力してもらう。<br>無い人もいるので空欄を許す。'},
+].map(r=>Object.assign(r,{act:['結論 '+r.no, r.t]}));
 /* ============ pages ============ */
 const COVER = '<svg class="mini" viewBox="0 0 320 132" aria-hidden="true">'+
  '<text class="lb" x="6" y="40">姓</text><rect class="bad" x="40" y="14" width="272" height="40" rx="7"/><text class="q" x="56" y="42">？</text>'+
@@ -483,44 +323,97 @@ const COVER = '<svg class="mini" viewBox="0 0 320 132" aria-hidden="true">'+
  '<p class="sub">Personal names, field-tested</p>'+
  '<p class="by">松本幸太郎 &nbsp;·&nbsp; @CannotSwift</p>';
 
-const INTRO =
- '<p class="kick">Falsehoods Programmers Believe About Names — McKenzie, 2010</p>'+
- '<ul class="falses">'+
-   '<li><i>#1</i><span>人には正確に1つのフルネームがある</span></li>'+
-   '<li><i>#6</i><span>名前は決まった文字数に収まる</span></li>'+
-   '<li><i>#9</i><span>名前は ASCII で表せる</span></li>'+
-   '<li><i>#11</i><span>名前は Unicode で表せる</span></li>'+
-   '<li class="me"><i>#18</i><span>名前には少なくとも1つ、家族で共有される部分がある</span></li>'+
-   '<li><i>#40</i><span>人には名前がある</span></li>'+
- '</ul>'+
- '<p class="lead today">40項目のうち、今日は1つだけ。<b>「人名は姓と名の2要素から成る」</b></p>';
+const LAYERS = '<div class="layers">'+Object.values(L).map(ly=>
+  '<div class="layer"><p class="lname">'+ly.t+'<i>'+ly.d+'</i></p>'+
+  '<ul class="four" style="counter-reset:four '+(+R.find(r=>r.ly===ly).no-1)+'">'+
+  R.filter(r=>r.ly===ly).map(r=>'<li>'+r.t+'</li>').join('')+'</ul></div>').join('')+'</div>';
+
+const CONCL =
+ '<p class="kick">結論から</p>'+
+ '<p class="big">名前は<em>正式な氏名</em>と<em>用途ごとの名前</em>に分けて受け取る。</p>'+
+ LAYERS+
+ '<p class="lead today">正式な氏名は本人の名前そのものとして預かり、用途ごとの名前は必要なときに足す。<br>守らないと何が起きるかを、世界の名前と実在するフォームで見ていく。</p>';
+
+const NAMES = [
+  ['Sukarno','インドネシア','1語だけ。姓が無い'],
+  ['Aung San Suu Kyi','ミャンマー','全体で1つの個人名'],
+  ['A. Rasiah','タミル系','父の名（頭文字）＋本人の名'],
+  ['Guðrún Jónsdóttir','アイスランド','本人の名＋父称'],
+  ['Isa bin Osman','マレーシア','本人の名＋bin＋父の名'],
+  ['Kaluhandhilage Hemachandra SILVA','シンハラ系','家系名＋名＋姓'],
+  ['Pablo Ruiz Picasso','スペイン語圏','名＋父方の姓＋母方の姓'],
+  ['Harpreet Kaur','シク教徒','名＋Kaur。Kaur は姓ではない'],
+];
+const MANY =
+ '<p class="kick">結論 01 / 03 &nbsp;—&nbsp; 正式な氏名</p>'+
+ '<p class="big">姓と名の2つに分けられない名前は、<em>どこにでもある</em>。</p>'+
+ '<ul class="names">'+NAMES.map(n=>'<li><b>'+n[0]+'</b><span>'+n[1]+'</span><i>'+n[2]+'</i></li>').join('')+'</ul>'+
+ '<p class="lead">それでも楽天・Apple・Facebook は、姓と名の両方を必須にしている。</p>'+
+ '<p class="fine">W3C「Personal names around the world」、英国政府の命名慣習ガイド（2006）</p>';
+
+const SVCS = [
+  {svc:'楽天（旧フォーム）', r:R[1], was:'デ ラ トーレ', v:'デラトーレ', st:'rw', m:'エラーを出さずにスペースを消す',
+   x:'ひらがな・半角カナも、黙って全角カタカナに変わる'},
+  {svc:'楽天（旧フォーム）', r:R[1], v:'髙橋', st:'err', m:'登録できない文字があります',
+   x:'ü・ë、𠮷、﨑、ハングル、簡体字、アラビア文字も拒否。境界は JIS X 0208 と一致'},
+  {svc:'Facebook', r:R[1], v:'Zoë', st:'err', m:'「タイトルまたはシンボル」扱いで拒否',
+   x:'Müller は通る。mcDONALD は大文字が多すぎ、Dr. Smith はピリオドが多すぎで拒否'},
+  {svc:'Apple', r:R[1], v:'Pablo Diego José Francisco de Paula Juan Nepomuceno', st:'err', m:'名は32文字まで',
+   x:'Google は名50文字、楽天は各欄85文字。USWDS の推奨は1欄128文字'},
+];
+const SERVICES =
+ '<p class="kick">結論 02 を守らないと &nbsp;—&nbsp; 実サービス</p>'+
+ '<p class="big">実在するフォームでも、名前は<em>変えられ</em>、<em>拒まれる</em>。</p>'+
+ '<ul class="svcs">'+SVCS.map(c=>
+   '<li class="'+c.st+'"><p class="sv">'+c.svc+'<span>結論 '+c.r.no+'</span></p>'+
+   '<p class="in">'+(c.was?'<s>'+c.was+'</s><i>→</i>':'')+c.v+'</p>'+
+   '<p class="ms">'+(c.st==='err'?'✕ ':'⚠ ')+c.m+'</p>'+
+   '<p class="ex">'+c.x+'</p></li>').join('')+'</ul>'+
+ '<p class="fine">2026年10月の観察（Playwright でダミー値を入力。登録は確定させていない）。Facebook・Apple のサーバー側の判定は未検証。</p>';
+
+const ADDRS = [
+  ['韓国','目上の人を名前で呼ぶのは失礼とされる。肩書き（선생님 など）や親族呼称で呼ぶ'],
+  ['タイ','日常は本名と無関係なことが多いニックネームで呼び合う'],
+  ['英国','初対面で名（given name）を使うと、以前に会ったことがあるような含みになる場合がある'],
+  ['中国・日本（歴史）','実名（諱）を口にするのは、はばかられた。字（あざな）や通称で呼んだ'],
+];
+const ADDR =
+ '<p class="kick">結論 03 を守らないと &nbsp;—&nbsp; 呼びかけ</p>'+
+ '<p class="big">正式な氏名で呼ぶのが、<em>失礼になる</em>文化がある。</p>'+
+ '<ul class="names addr">'+ADDRS.map(n=>'<li><span>'+n[0]+'</span><i>'+n[1]+'</i></li>').join('')+'</ul>'+
+ '<p class="lead">「お呼びする名前」は正式な氏名から作らず、別の欄で本人に尋ねる。<br>W3C も <b>What should we call you?</b> を別に尋ねる例を挙げている。</p>'+
+ '<p class="fine">W3C「Personal names around the world」（タイ・英国・呼びかけの欄）、コトバンク「諱」（山川 日本史小辞典）、Korea Atlas「Addressing People in Korea」</p>';
+
+const RULE = (...rs) =>
+ '<p class="kick">結論 '+rs.map(r=>r.no).join('・')+' / '+pad(R.length)+' &nbsp;—&nbsp; '+rs[0].ly.t+'</p>'+
+ rs.map(r=>'<p class="big"><em>'+r.t+'</em></p><p class="lead rule-lead">'+r.lead+'</p>').join('');
 
 const FERMI =
- '<p class="kick">間奏 &nbsp;/&nbsp; フェルミ推定</p>'+
+ '<p class="kick">結論 01 の補足 &nbsp;/&nbsp; フェルミ推定</p>'+
  '<p class="big">姓と名の2欄に収まらない人は<br>約 <em>2割</em>、<em>15〜17億人</em>。</p>'+
  '<p class="lead">インド一国の人口に匹敵する。外れ値ではない。</p>'+
  '<div class="bar"><div class="s1">約45%</div><div class="s2">約35%</div><div class="s3">約20%</div></div>'+
  '<div class="legend"><div class="l1">日本型（姓1語＋名1語）。<br>その約4割は中国の人口</div><div class="l2">世襲の姓はあるが、ミドルネーム・複数の姓・父称を持つ</div><div class="l3">2欄に分けられない</div></div>'+
- '<p class="fine">直接のデータは無い。国連の世界人口推計2024年版の概数による推定（出典は未取得）。幅は広義75〜85%、狭義35〜55%。最も効くのはインド（±2.7pt）とアフリカ（±2pt）。</p>';
+ '<p class="fine">直接のデータは無い。人口は国連「World Population Prospects 2024: Summary of Results」表A2（2024年1月1日時点。世界81.3億人、インド14.4億人、中国14.2億人）による。推定値の幅は、姓と名の2欄に分けられる人の割合が75〜85%（推定約80%）、日本型（姓1語＋名1語）の人の割合が35〜55%（推定約45%）。最も効くのはインド（±2.7pt）とアフリカ（±2pt）。</p>';
 
 const ICAO =
- '<p class="kick">第2幕 &nbsp;/&nbsp; 国際規格 &nbsp;—&nbsp; ICAO Doc 9303（旅券）</p>'+
- '<p class="big">旅券ですら、<em>姓＋名</em>を前提にしていない。</p>'+
+ '<p class="kick">裏付け &nbsp;/&nbsp; 国際規格 &nbsp;—&nbsp; ICAO Doc 9303（旅券）</p>'+
+ '<p class="big">世界中の人の名前を載せる旅券の規格は、<br><em>姓＋名</em>を前提にしていない。</p>'+
  '<div class="pp">'+
-   '<div class="viz"><p class="tag"><b>VIZ</b> &nbsp;目視欄 = 原本（各国の文字のまま）</p>'+
+   '<div class="viz"><p class="tag"><b>VIZ</b> &nbsp;目視欄 — 人が読む印字。各国の文字のまま = 原本</p>'+
      '<div class="vizrow"><span>第一識別子</span><strong>O\'Brien-Smith</strong><span>第二識別子</span><strong>Zoë</strong></div></div>'+
-   '<div class="mrz"><p class="tag"><b>MRZ</b> &nbsp;機械読取欄 = 派生表現（A–Z と &lt; のみ、名前は39文字）</p>'+
+   '<div class="mrz"><p class="tag"><b>MRZ</b> &nbsp;機械読取欄 — 顔写真ページ下端の2行。空港の読取機が OCR で読む。A–Z・0–9・&lt; のみ、名前は39文字 = 派生表現</p>'+
      '<code>P&lt;UTO<u>OBRIEN&lt;SMITH</u>&lt;&lt;<u>ZOE</u>&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code></div>'+
  '</div>'+
  '<ul class="pts">'+
    '<li><b>「姓／名」ではなく第一識別子／第二識別子。</b>2つに分けられなければ、名前全体が第一識別子。第二識別子は空でよい。</li>'+
    '<li><b>MRZ は意図的に情報を落とした派生表現。</b>アポストロフィは削除、ハイフンは区切り文字に。規定の手順以外で切り詰めない。</li>'+
    '<li><b>ISO/IEC 18013-5（モバイル運転免許証）</b>も <code>family_name</code> を「姓、名字、または第一識別子」と定義（二次情報）。</li>'+
-   '<li><b>フォームが借りるべきは構造。</b>A–Z や39文字という制約を写すと、誤謬 #6・#9 をそのまま実装することになる。</li>'+
+   '<li><b>フォームが真似すべきは「第一／第二識別子」の分け方。</b>MRZ の A–Z だけ・39文字までという制限は機械読取の都合なので、フォームに持ち込むと名前を削る・変えることになる。</li>'+
  '</ul>';
 
 const STRUCT =
- '<p class="kick">第4幕 &nbsp;/&nbsp; 結論</p>'+
+ '<p class="kick">どう持つか</p>'+
  '<p class="big">名前は<em>原本</em>と<em>派生表現</em>の2層で持つ。</p>'+
  '<pre class="tree"><span class="k">PersonName</span>\n'+
  '├─ <span class="o">fullName</span>        : <span class="ty">String</span>      <i>// 原本。入力されたまま保存</i>\n'+
@@ -540,9 +433,9 @@ const STRUCT =
  '    └─ exports{}                 <i>// 外部連携向け。本人が確認</i></pre>';
 
 const SLOGAN =
- '<p class="kick">第4幕 &nbsp;/&nbsp; 結論</p>'+
+ '<p class="kick">まとめ</p>'+
  '<p class="big">対策は難しくない。</p>'+
- '<ul class="four"><li>分割しない</li><li>必須にしない</li><li>書き換えない</li><li>文字を絞らない</li></ul>'+
+ LAYERS+
  '<p class="lead today">手本は USWDS（必須欄なし・1欄128文字・正規化しない）と、<br>Wise の「法的な氏名」と「呼び名」の2層構造。</p>';
 
 const QR_D = 'M0 0h7v1h-7zM10 0h1v1h-1zM13 0h1v1h-1zM16 0h2v1h-2zM19 0h6v1h-6zM26 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM10 1h1v1h-1zM13 1h5v1h-5zM26 1h1v1h-1zM32 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM8 2h1v1h-1zM12 2h2v1h-2zM15 2h1v1h-1zM18 2h1v1h-1zM21 2h2v1h-2zM24 2h1v1h-1zM26 2h1v1h-1zM28 2h3v1h-3zM32 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h1v1h-1zM11 3h2v1h-2zM14 3h4v1h-4zM19 3h1v1h-1zM26 3h1v1h-1zM28 3h3v1h-3zM32 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h1v1h-1zM11 4h3v1h-3zM15 4h1v1h-1zM18 4h2v1h-2zM21 4h1v1h-1zM23 4h1v1h-1zM26 4h1v1h-1zM28 4h3v1h-3zM32 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h2v1h-2zM12 5h1v1h-1zM14 5h3v1h-3zM20 5h2v1h-2zM26 5h1v1h-1zM32 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h7v1h-7zM8 7h3v1h-3zM12 7h1v1h-1zM15 7h1v1h-1zM19 7h1v1h-1zM21 7h1v1h-1zM0 8h1v1h-1zM2 8h5v1h-5zM10 8h1v1h-1zM13 8h3v1h-3zM17 8h1v1h-1zM26 8h5v1h-5zM1 9h2v1h-2zM4 9h1v1h-1zM7 9h2v1h-2zM11 9h2v1h-2zM16 9h5v1h-5zM22 9h3v1h-3zM26 9h2v1h-2zM29 9h4v1h-4zM0 10h1v1h-1zM4 10h5v1h-5zM11 10h1v1h-1zM15 10h1v1h-1zM18 10h1v1h-1zM22 10h1v1h-1zM25 10h2v1h-2zM28 10h1v1h-1zM30 10h2v1h-2zM0 11h1v1h-1zM5 11h1v1h-1zM12 11h1v1h-1zM14 11h3v1h-3zM18 11h1v1h-1zM20 11h3v1h-3zM24 11h1v1h-1zM26 11h1v1h-1zM28 11h5v1h-5zM2 12h2v1h-2zM6 12h3v1h-3zM12 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM22 12h1v1h-1zM24 12h1v1h-1zM27 12h3v1h-3zM31 12h2v1h-2zM1 13h1v1h-1zM4 13h1v1h-1zM7 13h1v1h-1zM9 13h1v1h-1zM11 13h2v1h-2zM14 13h3v1h-3zM19 13h5v1h-5zM26 13h1v1h-1zM30 13h3v1h-3zM2 14h1v1h-1zM5 14h3v1h-3zM9 14h1v1h-1zM13 14h1v1h-1zM17 14h2v1h-2zM20 14h1v1h-1zM25 14h2v1h-2zM28 14h1v1h-1zM30 14h2v1h-2zM1 15h3v1h-3zM5 15h1v1h-1zM8 15h2v1h-2zM11 15h1v1h-1zM13 15h2v1h-2zM16 15h1v1h-1zM18 15h1v1h-1zM21 15h1v1h-1zM25 15h2v1h-2zM28 15h3v1h-3zM1 16h1v1h-1zM5 16h5v1h-5zM14 16h1v1h-1zM16 16h5v1h-5zM23 16h3v1h-3zM27 16h2v1h-2zM32 16h1v1h-1zM0 17h2v1h-2zM5 17h1v1h-1zM7 17h1v1h-1zM10 17h2v1h-2zM14 17h1v1h-1zM16 17h1v1h-1zM18 17h6v1h-6zM26 17h2v1h-2zM29 17h2v1h-2zM32 17h1v1h-1zM0 18h1v1h-1zM3 18h2v1h-2zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM15 18h2v1h-2zM20 18h1v1h-1zM24 18h5v1h-5zM30 18h1v1h-1zM0 19h3v1h-3zM4 19h1v1h-1zM7 19h6v1h-6zM14 19h1v1h-1zM16 19h1v1h-1zM18 19h1v1h-1zM21 19h2v1h-2zM25 19h1v1h-1zM27 19h6v1h-6zM2 20h2v1h-2zM6 20h2v1h-2zM9 20h2v1h-2zM12 20h1v1h-1zM14 20h1v1h-1zM17 20h1v1h-1zM19 20h1v1h-1zM22 20h1v1h-1zM24 20h2v1h-2zM27 20h3v1h-3zM0 21h2v1h-2zM4 21h2v1h-2zM11 21h5v1h-5zM17 21h7v1h-7zM26 21h1v1h-1zM29 21h2v1h-2zM32 21h1v1h-1zM0 22h1v1h-1zM2 22h1v1h-1zM4 22h6v1h-6zM11 22h2v1h-2zM15 22h1v1h-1zM17 22h1v1h-1zM21 22h1v1h-1zM26 22h1v1h-1zM28 22h4v1h-4zM0 23h1v1h-1zM3 23h1v1h-1zM5 23h1v1h-1zM8 23h2v1h-2zM14 23h2v1h-2zM18 23h1v1h-1zM20 23h3v1h-3zM24 23h4v1h-4zM29 23h3v1h-3zM0 24h1v1h-1zM2 24h1v1h-1zM4 24h3v1h-3zM8 24h1v1h-1zM11 24h2v1h-2zM15 24h1v1h-1zM17 24h1v1h-1zM24 24h6v1h-6zM32 24h1v1h-1zM8 25h1v1h-1zM11 25h2v1h-2zM17 25h5v1h-5zM23 25h2v1h-2zM28 25h1v1h-1zM30 25h3v1h-3zM0 26h7v1h-7zM9 26h2v1h-2zM14 26h3v1h-3zM20 26h5v1h-5zM26 26h1v1h-1zM28 26h1v1h-1zM30 26h2v1h-2zM0 27h1v1h-1zM6 27h1v1h-1zM8 27h4v1h-4zM13 27h2v1h-2zM16 27h1v1h-1zM19 27h3v1h-3zM23 27h2v1h-2zM28 27h5v1h-5zM0 28h1v1h-1zM2 28h3v1h-3zM6 28h1v1h-1zM8 28h1v1h-1zM10 28h1v1h-1zM13 28h2v1h-2zM17 28h1v1h-1zM20 28h1v1h-1zM22 28h1v1h-1zM24 28h6v1h-6zM32 28h1v1h-1zM0 29h1v1h-1zM2 29h3v1h-3zM6 29h1v1h-1zM8 29h1v1h-1zM12 29h4v1h-4zM17 29h4v1h-4zM23 29h1v1h-1zM25 29h1v1h-1zM28 29h1v1h-1zM30 29h3v1h-3zM0 30h1v1h-1zM2 30h3v1h-3zM6 30h1v1h-1zM8 30h1v1h-1zM11 30h1v1h-1zM13 30h1v1h-1zM15 30h1v1h-1zM18 30h1v1h-1zM20 30h1v1h-1zM22 30h2v1h-2zM26 30h2v1h-2zM0 31h1v1h-1zM6 31h1v1h-1zM12 31h5v1h-5zM21 31h1v1h-1zM25 31h2v1h-2zM28 31h3v1h-3zM0 32h7v1h-7zM8 32h2v1h-2zM12 32h1v1h-1zM14 32h1v1h-1zM17 32h1v1h-1zM22 32h3v1h-3zM26 32h2v1h-2zM29 32h1v1h-1zM31 32h1v1h-1z';
@@ -563,85 +456,39 @@ const OUTRO =
  '</a>';
 
 /* ============ render ============ */
-const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const N = F.length;
 const pad = n => String(n).padStart(2,'0');
 
-function formHTML(f){
-  let h = '<div class="fhead"><div><div class="svc">'+esc(f.svc)+'</div><div class="ftitle">'+GENERIC+'</div></div>'+
-          '<div class="who">'+esc(f.who)+'</div></div>';
-  f.fields.forEach(x=>{
-    const v = x.was ? '<span class="rw-was">'+esc(x.was)+'</span><span class="rw-arr">→</span>'+esc(x.v) : esc(x.v);
-    h += '<div class="row '+(x.st||'')+'"><label>'+esc(x.l)+(x.req?'<span class="req">必須</span>':'')+'</label>'+
-         '<div class="inp'+(v?'':' empty')+'">'+v+'</div>'+
-         (x.m ? '<div class="fmsg">'+esc(x.m)+'</div>' : '')+'</div>';
-  });
-  h += '<div class="submit"><span class="verdict '+f.verdict[0]+'">'+(f.verdict[0]==='ok'?'✓ ':'✕ ')+esc(f.verdict[1])+'</span>'+
-       '<span class="btn">登録する</span></div>';
-  return h;
-}
-
-const ticks = document.getElementById('ticks');
-ticks.innerHTML = F.map(()=>'<div class="tk"></div>').join('');
-const TK = [...ticks.children];
-
 /* ============ steps ============ */
-const STEPS = [{t:'page',h:COVER,cover:1},{t:'page',h:INTRO,act:'<b>はじめに</b>'}];
-F.forEach((f,i)=>{
-  if(i===5){
-    STEPS.push({t:'page',h:FERMI,act:'間奏 &nbsp;/&nbsp; <b>規模</b>',done:5});
-    STEPS.push({t:'page',h:ICAO,act:'第2幕 &nbsp;/&nbsp; <b>国際規格</b>',done:5});
-  }
-  STEPS.push({t:'ask',f,i}); STEPS.push({t:'tell',f,i});
-});
-STEPS.push({t:'page',h:STRUCT,act:'第4幕 &nbsp;/&nbsp; <b>結論</b>',done:N});
-STEPS.push({t:'page',h:SLOGAN,act:'第4幕 &nbsp;/&nbsp; <b>結論</b>',done:N});
-STEPS.push({t:'page',h:OUTRO,act:'<b>持ち帰り</b>',done:N,outro:1});
+const actOf = a => a[0]+' &nbsp;/&nbsp; <b>'+a[1]+'</b>';
+const STEPS = [{t:'page',h:COVER,cover:1},{t:'page',h:CONCL,act:'<b>結論から</b>'}];
+STEPS.push({t:'page',h:RULE(R[0]),act:actOf(R[0].act)});
+STEPS.push({t:'page',h:MANY,act:actOf([R[0].act[0],'反例'])});
+STEPS.push({t:'page',h:FERMI,act:actOf([R[0].act[0],'規模'])});
+STEPS.push({t:'page',h:RULE(R[1]),act:actOf(R[1].act)});
+STEPS.push({t:'page',h:SERVICES,act:actOf([R[1].act[0],'実サービス'])});
+STEPS.push({t:'page',h:RULE(R[2]),act:actOf(R[2].act)});
+STEPS.push({t:'page',h:ADDR,act:actOf([R[2].act[0],'呼びかけ'])});
+STEPS.push({t:'page',h:ICAO,act:'裏付け &nbsp;/&nbsp; <b>国際規格</b>'});
+STEPS.push({t:'page',h:STRUCT,act:'<b>どう持つか</b>'});
+STEPS.push({t:'page',h:SLOGAN,act:'<b>まとめ</b>'});
+STEPS.push({t:'page',h:OUTRO,act:'<b>持ち帰り</b>',outro:1});
 
-const rail = document.getElementById('rail');
 const page = document.getElementById('page');
-const form = document.getElementById('form');
 const actEl = document.getElementById('act');
 const countEl = document.getElementById('count');
+const ticks = document.getElementById('ticks');
+ticks.innerHTML = STEPS.slice(1).map(()=>'<div class="tk"></div>').join('');
+const TK = [...ticks.children];
 let step = 0;
 
 function paint(){
   const s = STEPS[step];
-  document.body.classList.remove('open','is-page','is-cover','is-outro');
-  form.classList.remove('hit');
-
-  if(s.t==='page'){
-    document.body.classList.add('is-page');
-    if(s.cover) document.body.classList.add('is-cover');
-    if(s.outro) document.body.classList.add('is-outro');
-    page.innerHTML = s.h;
-    rail.innerHTML = '';
-    if(s.act) actEl.innerHTML = s.act;
-    const d = s.done||0;
-    countEl.innerHTML = '事例 <b>'+pad(d)+'</b> / '+N;
-    TK.forEach((t,n)=>t.className='tk'+(n<d?' done':''));
-    return;
-  }
-
-  const {f,i} = s;
-  actEl.innerHTML = f.act[0]+' &nbsp;/&nbsp; <b>'+f.act[1]+'</b>';
-  countEl.innerHTML = '事例 <b>'+pad(i+1)+'</b> / '+N;
-  TK.forEach((t,n)=>{ t.className = 'tk' + (n<i ? ' done' : n===i ? (s.t==='tell'?' done':' on') : ''); });
-
-  form.innerHTML = formHTML(f);
-  form.classList.add('hit');
-  document.body.classList.add('open');
-  if(s.t==='ask'){
-    rail.innerHTML = '<div class="no">'+pad(i+1)+'</div><div class="wait">？</div>';
-  }else{
-    let h = '<div class="reveal" style="display:flex;flex-direction:column;gap:1.1rem;flex:1">';
-    h += '<div class="no">'+pad(i+1)+'</div>';
-    h += '<h2 class="label">'+f.label+'</h2>';
-    if(f.punch) h += '<p class="punch">'+f.punch+'</p>';
-    h += '<p class="note">'+f.note+'</p>';
-    h += '<div class="src">'+f.src+'</div></div>';
-    rail.innerHTML = h;
-  }
+  document.body.classList.toggle('is-cover', !!s.cover);
+  document.body.classList.toggle('is-outro', !!s.outro);
+  page.innerHTML = s.h;
+  if(s.act) actEl.innerHTML = s.act;
+  countEl.innerHTML = '<b>'+pad(step)+'</b> / '+pad(STEPS.length-1);
+  TK.forEach((t,n)=>t.className='tk'+(n<step?' done':''));
 }
 const go = d => { step = Math.max(0, Math.min(STEPS.length-1, step+d)); paint(); };
 
@@ -659,7 +506,7 @@ addEventListener('keydown', e=>{
   }
 });
 addEventListener('click', e=>{
-  if(e.target.closest('a') || e.target.closest('.rail')) return;
+  if(e.target.closest('a')) return;
   go(1);
 });
 let lock = 0;
