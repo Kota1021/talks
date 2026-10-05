@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>あれをモーダルと呼ぶな</title>
+<meta name="description" content="「モーダル」は名詞じゃない、形容詞だ。UI 開発に関わるエンジニア・デザイナーのための用語整理。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+:root{
+  --ground:#F1EDE8; --surface:#FBF8F4; --rule:#DED4C8; --tint:#E8E1D9;
+  --ink:#241C16; --dim:#6E6055; --faint:#9C8C7E; --flag:#C0361D;
+  --chip:#241C16; --chip-ink:#FBF8F4; --chip-dim:#BDB2A7;
+  --mono:'IBM Plex Mono','Zen Kaku Gothic New',ui-monospace,monospace;
+  --sans:'Zen Kaku Gothic New',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#17120F; --surface:#1E1814; --rule:#372C25; --tint:#2A221D;
+  --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52; --flag:#F2603F;
+  --chip:#EFE6DC; --chip-ink:#17120F; --chip-dim:#5E5249;
+}}
+:root[data-theme="dark"]{
+  --ground:#17120F; --surface:#1E1814; --rule:#372C25; --tint:#2A221D;
+  --ink:#EFE6DC; --dim:#A29386; --faint:#6B5D52; --flag:#F2603F;
+  --chip:#EFE6DC; --chip-ink:#17120F; --chip-dim:#5E5249;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ground); color:var(--ink); font-family:var(--sans); overflow:hidden;
+     -webkit-font-smoothing:antialiased; line-height:1.5}
+
+/* 1280×720 の固定ステージを画面に合わせて拡縮する */
+.viewport{position:fixed; inset:0; display:grid; place-items:center}
+.stage{width:1280px; height:720px; position:relative; transform-origin:center center; flex:none}
+.slide{position:absolute; inset:0; background:var(--surface); border:1px solid var(--rule);
+       border-radius:10px; padding:56px 68px; display:none; flex-direction:column; overflow:hidden}
+.slide.on{display:flex; animation:in .32s cubic-bezier(.2,.8,.3,1)}
+@keyframes in{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+
+.kicker{font-family:var(--mono); font-size:15px; letter-spacing:.06em; color:var(--dim);
+        padding-bottom:12px; border-bottom:1px solid var(--rule); margin-bottom:34px; font-weight:500}
+.kicker b{color:var(--flag); font-weight:500; margin-right:1.2em}
+.center{text-align:center}
+.dim{color:var(--dim)}
+.grow{flex:1}
+
+/* 大見出しスライド */
+.hero{justify-content:center; padding-left:96px}
+.hero::before{content:""; position:absolute; left:0; top:50%; translate:0 -50%; width:24px; height:190px; background:var(--flag)}
+.hero h1{font-size:70px; font-weight:900; line-height:1.25; letter-spacing:.01em}
+.hero .lede{font-size:26px; color:var(--dim); margin-top:14px}
+.hero hr{border:0; border-top:2px solid var(--ink); width:640px; margin:36px 0 20px}
+.hero .by{font-size:18px; color:var(--dim)}
+
+.big{font-size:40px; font-weight:900; line-height:1.4}
+.mid{font-size:30px; font-weight:700; line-height:1.5}
+.small{font-size:17px; color:var(--dim)}
+.band{background:var(--chip); color:var(--chip-ink); border-radius:8px; padding:24px 30px;
+      font-size:26px; font-weight:700}
+.tiles{display:flex; gap:20px}
+.tile{flex:1; background:var(--tint); border-radius:8px; padding:20px; text-align:center;
+      font-size:22px; font-weight:700}
+.tile.bad{background:var(--chip); color:var(--chip-ink)}
+
+/* スクショ */
+.shot{display:block; border:1px solid var(--rule); border-radius:12px; background:var(--tint)}
+.cap{font-size:16px; font-weight:700; text-align:center; margin-top:8px}
+.cap small{display:block; font-size:14px; font-weight:400; color:var(--dim)}
+.row{display:flex; align-items:center; justify-content:center; gap:28px}
+.arrow{display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--dim);
+       font-size:14px; font-weight:700}
+.arrow span:last-child{font-size:40px; color:var(--ink); line-height:1}
+
+/* クイズ（iOS / Android 並置） */
+.compare{display:grid; grid-template-columns:110px repeat(3,180px); column-gap:56px; row-gap:16px;
+         justify-content:center; align-items:center}
+.compare .os{font-size:19px; font-weight:700; color:var(--dim); text-align:right}
+.compare img{height:220px; width:auto; margin-inline:auto}
+.compare .lab{font-size:20px; font-weight:700; text-align:center; visibility:hidden}
+.compare.answer .lab{visibility:visible}
+
+.cards{display:flex; gap:44px; justify-content:center}
+.card{width:420px; border:1.5px solid var(--ink); border-radius:8px; padding:30px 32px}
+.card h3{font-size:26px; font-weight:900; margin-bottom:12px}
+.card p{font-size:18px; color:var(--dim)}
+.pet{width:420px; background:var(--tint); border-radius:8px; padding:30px; text-align:center}
+.pet .e{font-size:84px; line-height:1.2}
+.pet .n{font-size:19px; color:var(--dim); font-weight:700; margin-top:8px}
+.pet .a{font-size:28px; font-weight:900}
+
+.points{display:flex; flex-direction:column; gap:30px}
+.point{display:flex; gap:24px; align-items:flex-start}
+.point .n{flex:none; width:52px; height:52px; border-radius:50%; background:var(--chip); color:var(--chip-ink);
+          display:grid; place-items:center; font-size:22px; font-weight:900}
+.point h3{font-size:28px; font-weight:900}
+.point p{font-size:18px; color:var(--dim)}
+
+.split{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+.panel{border-radius:8px; padding:26px 30px; background:var(--tint)}
+.panel.dark{background:var(--chip); color:var(--chip-ink)}
+.panel h3{font-size:24px; font-weight:900; margin-bottom:8px}
+.panel p{font-size:17px; margin-top:8px}
+.panel .q{font-size:14px; opacity:.72; margin-top:16px; font-family:var(--mono)}
+
+table{border-collapse:collapse; width:100%; font-size:15px}
+th{background:var(--chip); color:var(--chip-ink); text-align:left; padding:12px 14px; font-size:15px}
+td{padding:14px; border-bottom:1px solid var(--rule); vertical-align:middle; white-space:pre-line}
+td:first-child{font-size:21px; font-weight:900}
+td code,.mono{font-family:var(--mono); font-size:14px}
+
+.refs{list-style:none; display:flex; flex-direction:column; gap:6px}
+.refs a{display:grid; grid-template-columns:460px 1fr; gap:20px; color:inherit; text-decoration:none;
+        padding:9px 0; border-bottom:1px solid var(--rule); font-size:16px; font-weight:700}
+.refs a span{font-family:var(--mono); font-size:13px; font-weight:400; color:var(--dim)}
+.refs a:hover span,.refs a:focus-visible span{color:var(--flag)}
+
+/* 操作 UI */
+.hud{position:fixed; left:0; right:0; bottom:0; display:flex; align-items:center; gap:14px;
+     padding:10px 16px; font-family:var(--mono); font-size:12px; color:var(--faint); pointer-events:none}
+.hud .bar{flex:1; height:2px; background:var(--rule); border-radius:2px; overflow:hidden}
+.hud .bar i{display:block; height:100%; background:var(--flag); transition:width .3s}
+.hud button,.hud a{pointer-events:auto; font:inherit; color:var(--dim); background:none; border:1px solid var(--rule);
+     border-radius:999px; padding:4px 11px; cursor:pointer; text-decoration:none}
+.hud button:hover,.hud a:hover{color:var(--flag); border-color:var(--flag)}
+.hud button:focus-visible,.hud a:focus-visible{outline:2px solid var(--flag); outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="viewport" id="vp">
+<main class="stage" id="stage" aria-live="polite">
+
+<!-- タイトル -->
+<section class="slide hero" data-title="タイトル">
+  <h1>あれを「モーダル」と呼ぶな</h1>
+  <p class="lede">──「モーダル」は名詞じゃない、形容詞だ</p>
+  <hr>
+  <p class="by">UI開発に関わるエンジニア、デザイナーのための用語整理 · 松本幸太郎</p>
+</section>
+
+<!-- 01 クイズ -->
+<section class="slide" data-title="これ、なんて呼んでいますか？">
+  <p class="kicker"><b>01</b>これ、なんて呼んでいますか？</p>
+  <div class="compare">
+    <span class="os">iOS</span>
+    <img class="shot" src="img/preview_dialog.jpg" alt="iOS のダイアログ" width="413" height="900">
+    <img class="shot" src="img/preview_sheet.jpg" alt="iOS のボトムシート" width="413" height="900">
+    <img class="shot" src="img/preview_fullscreen.jpg" alt="iOS の全画面ビュー" width="413" height="900">
+    <span class="os">Android</span>
+    <img class="shot" src="img/android_dialog.jpg" alt="Android のダイアログ" width="405" height="900">
+    <img class="shot" src="img/android_sheet.jpg" alt="Android のボトムシート" width="405" height="900">
+    <img class="shot" src="img/android_fullscreen.jpg" alt="Android の全画面ビュー" width="405" height="900">
+  </div>
+  <p class="mid center" style="margin-top:22px">これ、なんて呼んでいますか？</p>
+</section>
+
+<section class="slide" data-title="答え合わせ">
+  <p class="kicker"><b>01</b>これ、なんて呼んでいますか？</p>
+  <div class="compare answer">
+    <span class="os">iOS</span>
+    <img class="shot" src="img/preview_dialog.jpg" alt="iOS のダイアログ" width="413" height="900">
+    <img class="shot" src="img/preview_sheet.jpg" alt="iOS のボトムシート" width="413" height="900">
+    <img class="shot" src="img/preview_fullscreen.jpg" alt="iOS の全画面ビュー" width="413" height="900">
+    <span class="os">Android</span>
+    <img class="shot" src="img/android_dialog.jpg" alt="Android のダイアログ" width="405" height="900">
+    <img class="shot" src="img/android_sheet.jpg" alt="Android のボトムシート" width="405" height="900">
+    <img class="shot" src="img/android_fullscreen.jpg" alt="Android の全画面ビュー" width="405" height="900">
+    <span></span><span class="lab">ダイアログ</span><span class="lab">ボトムシート</span><span class="lab">全画面ビュー</span>
+  </div>
+</section>
+
+<!-- 02 問題提起 -->
+<section class="slide" data-title="問題はどこにある？">
+  <p class="kicker"><b>02</b>問題はどこにある？</p>
+  <p class="big">「モーダル」はUI部品ではない</p>
+  <p class="small" style="margin-top:44px; font-weight:700">こう並べていないか：</p>
+  <div class="tiles" style="margin-top:14px; width:860px">
+    <span class="tile">ボタン</span><span class="tile">カード</span><span class="tile bad">モーダル ?</span>
+  </div>
+  <p class="mid" style="margin-top:44px">「モーダル」という名前の部品は存在しない。</p>
+  <p class="small" style="font-size:22px">ミスコミュニケーションの発生原因</p>
+</section>
+
+<!-- 03 形容詞を名詞的に誤用するな -->
+<section class="slide hero" data-title="形容詞を名詞的に誤用するな">
+  <h1>形容詞を名詞的に<br>誤用するな。</h1>
+</section>
+
+<section class="slide" data-title="ネコもイヌもかわいい">
+  <p class="kicker"><b>03</b>形容詞を名詞的に誤用するな</p>
+  <div class="grow" style="display:grid; place-items:center">
+    <div class="cards">
+      <div class="pet"><div class="e" aria-hidden="true">🐱</div><p class="n">ネコ</p><p class="a">かわいい</p></div>
+      <div class="pet"><div class="e" aria-hidden="true">🐶</div><p class="n">イヌ</p><p class="a">かわいい</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="カワイイとは呼ばない">
+  <p class="kicker"><b>03</b>形容詞を名詞的に誤用するな</p>
+  <p class="mid dim">でも、どちらも「カワイイ」とは呼ばない。</p>
+  <p class="mid" style="margin-top:18px">「かわいい猫」「かわいい犬」と、<br>名詞を修飾して言う。</p>
+  <div class="grow"></div>
+  <p class="band">「モーダル」も同じ。だから、あれを「モーダル」と呼ぶな。</p>
+</section>
+
+<!-- 04 結論 -->
+<section class="slide" data-title="結論">
+  <p class="kicker"><b>04</b>結論：モーダルな〇〇といえ。</p>
+  <p class="big">「モーダル（modal）」は形容詞。</p>
+  <p class="mid dim" style="font-weight:400">意味は「モード的な」。</p>
+  <p class="band" style="margin-top:34px">○ 「モーダルなダイアログ」「モーダルなシート」と修飾せよ</p>
+  <p class="small" style="margin-top:34px; font-weight:700; font-size:19px">名詞になるのは “部品” の側：</p>
+  <p class="mid">ダイアログ ／ シート ／ 全画面ビュー …</p>
+</section>
+
+<!-- 05 モードとは -->
+<section class="slide hero" data-title="モードとは"><h1>モードとは</h1></section>
+
+<section class="slide" data-title="モードとは（詳細）">
+  <p class="kicker"><b>05</b>モードとは</p>
+  <p class="big">みんなが想像する、あの「◯◯モード」。</p>
+  <p class="small" style="margin-top:36px; font-weight:700">普段から、自然に使っている：</p>
+  <div class="tiles" style="margin-top:14px">
+    <span class="tile">編集モード</span><span class="tile">検索モード</span><span class="tile">サイレントモード</span><span class="tile">機内モード</span>
+  </div>
+  <p class="mid" style="margin-top:48px">特別な概念じゃない。要は「ある状態に入る」こと。</p>
+</section>
+
+<!-- 06 モーダルとは -->
+<section class="slide hero" data-title="モーダルとは"><h1>モーダルとは</h1></section>
+
+<section class="slide" data-title="モーダルとは（詳細）">
+  <p class="kicker"><b>06</b>モーダルとは</p>
+  <p class="big">モード遷移を「操作ブロッキング付き」で<br>表現する特性。</p>
+  <div class="cards" style="margin-top:40px">
+    <div class="card"><h3>① モード遷移する</h3><p>あるモードから別のモードへ移る</p></div>
+    <div class="card"><h3>② 親ビューをブロック</h3><p>元の画面の操作を受け付けない</p></div>
+  </div>
+  <p class="small center" style="margin-top:34px">※「明示的に閉じる（dismiss）」は Apple が挙げる“特徴”。定義の本質は上の2点。</p>
+</section>
+
+<!-- 07 具体例 -->
+<section class="slide" data-title="具体例①：連絡先アプリ">
+  <p class="kicker"><b>07</b>具体例①：別のモードに入り、親ビューをブロック（連絡先アプリ）</p>
+  <p class="center" style="font-size:22px; font-weight:700; margin-top:-14px">編集モード → モーダルなシート</p>
+  <div class="row" style="margin-top:14px; gap:70px">
+    <figure><img class="shot" src="img/01_contact_view.jpg" alt="連絡先アプリの閲覧画面" style="height:400px; width:auto" width="508" height="1100"><figcaption class="cap dim">閲覧モード</figcaption></figure>
+    <div class="arrow"><span>「編集」</span><span aria-hidden="true">→</span></div>
+    <figure><img class="shot" src="img/02_contact_edit.jpg" alt="連絡先アプリの編集シート" style="height:400px; width:auto" width="508" height="1100"><figcaption class="cap">編集モード</figcaption></figure>
+  </div>
+  <p class="center" style="font-size:20px; font-weight:700; margin-top:14px">見た目は違っても、“モーダルという性質”は同じ。</p>
+</section>
+
+<section class="slide" data-title="具体例②：Pages">
+  <p class="kicker"><b>07</b>具体例②：別のモードに入り、親ビューをブロック（Pages）</p>
+  <p class="center" style="font-size:22px; font-weight:700; margin-top:-14px">権限要求モード → モーダルなダイアログ</p>
+  <figure style="margin:14px auto 0"><img class="shot" src="img/03_permission_camera.jpg" alt="Pages のカメラ権限要求ダイアログ" style="height:400px; width:auto" width="508" height="1100"><figcaption class="cap dim">応答するまで親ビューへの操作をブロック</figcaption></figure>
+  <p class="center" style="font-size:20px; font-weight:700; margin-top:14px">見た目は違っても、“モーダルという性質”は同じ。</p>
+</section>
+
+<!-- 08 Maps -->
+<section class="slide" data-title="シートでも、モーダルとは限らない">
+  <p class="kicker"><b>08</b>シートでも、モーダルとは限らない</p>
+  <div class="row" style="gap:30px; margin-top:-8px">
+    <figure><img class="shot" src="img/05_map_normal.jpg" alt="マップ：シートなし" style="height:380px; width:auto" width="508" height="1100"><figcaption class="cap">通常モード<small>シートなし</small></figcaption></figure>
+    <div class="arrow"><span>上にスワイプ</span><span aria-hidden="true">→</span></div>
+    <figure><img class="shot" src="img/06_map_half_sheet.jpg" alt="マップ：半分の高さのシート" style="height:380px; width:auto" width="508" height="1100"><figcaption class="cap">シート・非モーダル<small>地図を操作できる（ブロックしない）</small></figcaption></figure>
+    <div class="arrow"><span>さらに上へ</span><span aria-hidden="true">→</span></div>
+    <figure><img class="shot" src="img/07_map_full_sheet.jpg" alt="マップ：全画面まで上げたシート" style="height:380px; width:auto" width="508" height="1100"><figcaption class="cap">シート・モーダル<small>地図を覆う・操作をブロック</small></figcaption></figure>
+  </div>
+  <p class="center" style="font-size:19px; font-weight:700; margin-top:16px">モーダルであるか否かは　1. モード遷移するか　2. 親ビューへの操作をブロックするか</p>
+</section>
+
+<!-- 09 まとめ -->
+<section class="slide" data-title="まとめ">
+  <p class="kicker"><b>09</b>まとめ</p>
+  <div class="points">
+    <div class="point"><span class="n">1</span><div><h3>形容詞として呼ぶ</h3><p>「モーダルな◯◯」と修飾する</p></div></div>
+    <div class="point"><span class="n">2</span><div><h3>見た目でなく“役割”で決める</h3><p>モード遷移＋操作ブロッキングがあるか</p></div></div>
+    <div class="point"><span class="n">3</span><div><h3>OS非依存の共通語</h3><p>iOS / Android で同じ意味で使える</p></div></div>
+  </div>
+  <div class="grow"></div>
+  <div style="border-top:2px solid var(--ink); padding-top:18px">
+    <p class="dim" style="font-size:22px">✕「あれモーダル？」</p>
+    <p class="mid" style="font-weight:900">◯「あれはモーダルなシートね」</p>
+  </div>
+</section>
+
+<!-- Appendix -->
+<section class="slide hero" data-title="Appendix">
+  <h1>Appendix</h1>
+  <p class="lede">Q&amp;A・補足用ストック</p>
+</section>
+
+<section class="slide" data-title="A1 モーダルはどこで使うべきか">
+  <p class="kicker"><b>A1</b>モーダルはどこで使うべきか？</p>
+  <p style="font-size:18px; font-weight:700; margin-top:-12px">判断は見た目でなく“役割”。モーダルは「現在の文脈に紐づく自己完結タスク」に使い、独立した画面には使わない。</p>
+  <div class="split" style="margin-top:22px">
+    <div class="panel dark">
+      <h3>モーダルが適切</h3>
+      <p style="color:var(--chip-dim)">現在の文脈に紐づく自己完結タスク</p>
+      <p>iOS: sheet ／ Android: ModalBottomSheet</p>
+      <p>例：閲覧モード ⇄ 編集モード</p>
+      <p class="q">HIG Sheets: “a scoped task that's closely related to their current context”</p>
+    </div>
+    <div class="panel">
+      <h3>独立画面には使わない</h3>
+      <p class="dim">地の画面と無関係な独立した画面</p>
+      <p>→ ドリルダウン（push ／ navigate()）</p>
+      <p>例：商品一覧から商品詳細へ進む</p>
+      <p class="q">HIG Modality: “avoid … an app within your app / a hierarchy within a modal task”</p>
+    </div>
+  </div>
+  <p style="font-size:16px; font-weight:700; margin-top:22px">Material も同じ：modal bottom sheet は “a set of choices ／ an alternative to inline menus and simple dialogs”＝補助UI。</p>
+  <p class="small" style="font-size:14px; margin-top:8px">出典：Apple HIG ― Sheets／Modality、WWDC22、Material ― Bottom sheets</p>
+</section>
+
+<section class="slide" data-title="A2 メディア再生は modal？">
+  <p class="kicker"><b>A2</b>メディア再生は modal？ ── 出し方次第</p>
+  <div class="split">
+    <div class="panel dark">
+      <h3>モーダルな全画面</h3>
+      <p style="font-size:20px">親を凍結し ×/Done で閉じる<br>プレイヤー／ビューア</p>
+      <p class="q">HIG Modality：全画面モーダルは “videos, photos, or camera views” に有効</p>
+    </div>
+    <div class="panel">
+      <h3>非モーダルな全画面</h3>
+      <p style="font-size:20px">コンテンツ自体が全画面<br>（親を持たず dismiss 不要）</p>
+      <p class="q">HIG Going full screen：好例＝ゲーム・読書・メディア視聴</p>
+    </div>
+  </div>
+  <p class="mid" style="font-size:22px; margin-top:34px">判定は“全画面かどうか”ではなく、親ビューをブロックし明示 dismiss するか。</p>
+  <p class="small" style="font-size:14px; margin-top:12px">出典：Apple HIG ― Modality／Going full screen（同 HIG が “nonmodal types of full-screen experiences” を明記）</p>
+</section>
+
+<section class="slide" data-title="A3 ナビゲーションの3分類">
+  <p class="kicker"><b>A3</b>OS非依存で呼ぶ：ナビゲーションの3分類（Material）</p>
+  <table>
+    <thead><tr><th style="width:170px">分類（Material）</th><th style="width:200px">動き</th><th>iOS の例（API）</th><th>Android の例（API）</th></tr></thead>
+    <tbody>
+      <tr><td>Lateral</td><td>同じ階層の画面間を移動</td><td><code>UITabBarController</code> ／ <code>TabView</code>
+<code>UISegmentedControl</code></td><td><code>NavigationBar</code>（<code>BottomNavigationView</code>）
+<code>TabLayout</code> + <code>ViewPager2</code></td></tr>
+      <tr><td>Forward</td><td>階層を下る・フローを前進</td><td><code>pushViewController</code>
+<code>NavigationStack</code>（<code>NavigationLink</code>）</td><td>Navigation Component <code>navigate()</code>
+<code>FragmentTransaction</code></td></tr>
+      <tr><td>Reverse</td><td>後退（戻る）</td><td><code>popViewController</code> ／ <code>dismiss</code>
+ナビゲーションの戻るボタン</td><td>システム Back ／ Up（<code>navigateUp</code>）
+<code>finish()</code></td></tr>
+    </tbody>
+  </table>
+  <p class="small" style="margin-top:22px">Material の分類語（Lateral / Forward / Reverse）がそのまま OS 非依存の呼称。push などは iOS の実装語にすぎない。</p>
+</section>
+
+<section class="slide" data-title="A4 一次情報">
+  <p class="kicker"><b>A4</b>一次情報（出典）</p>
+  <ul class="refs" style="margin-top:-14px">
+    <li><a href="https://developer.apple.com/design/human-interface-guidelines/modality">Apple HIG — Modality<span>developer.apple.com/design/human-interface-guidelines/modality</span></a></li>
+    <li><a href="https://developer.apple.com/design/human-interface-guidelines/going-full-screen">Apple HIG — Going full screen<span>developer.apple.com/design/human-interface-guidelines/going-full-screen</span></a></li>
+    <li><a href="https://developer.apple.com/design/human-interface-guidelines/sheets">Apple HIG — Sheets<span>developer.apple.com/design/human-interface-guidelines/sheets</span></a></li>
+    <li><a href="https://developer.apple.com/videos/play/wwdc2022/10001/">WWDC22 — Explore navigation design for iOS<span>developer.apple.com/videos/play/wwdc2022/10001/</span></a></li>
+    <li><a href="https://developer.android.com/guide/navigation/principles">Android — Principles of navigation<span>developer.android.com/guide/navigation/principles</span></a></li>
+    <li><a href="https://m2.material.io/design/navigation/understanding-navigation.html">Material — Understanding navigation<span>m2.material.io/design/navigation/understanding-navigation.html</span></a></li>
+    <li><a href="https://m3.material.io/components/bottom-sheets/guidelines">Material — Bottom sheets<span>m3.material.io/components/bottom-sheets/guidelines</span></a></li>
+    <li><a href="https://m3.material.io/styles/motion/transitions">Material 3 — Transitions<span>m3.material.io/styles/motion/transitions</span></a></li>
+    <li><a href="https://en.wikipedia.org/wiki/Mode_(user_interface)">Wikipedia — Mode (user interface)<span>en.wikipedia.org/wiki/Mode_(user_interface)</span></a></li>
+  </ul>
+</section>
+
+<section class="slide" data-title="A5 モードの古典的な定義">
+  <p class="kicker"><b>A5</b>モードの古典的な定義</p>
+  <p class="small" style="font-weight:700; font-size:19px">古典的な定義：</p>
+  <p class="mid">同じ入力が、状態によって別の意味に解釈される状態。</p>
+  <div class="panel" style="margin-top:36px; font-size:22px">
+    <p>例：キーの「A」は、通常モードでは文字入力。</p>
+    <p>　　コマンドモードでは“別の操作”として解釈される。</p>
+  </div>
+  <p class="small" style="margin-top:34px">cf. Larry Tesler「NO MODES」── モードレスの追求（Tesler / Raskin）</p>
+</section>
+
+</main>
+</div>
+
+<nav class="hud" aria-label="スライド操作">
+  <a href="../" title="登壇資料一覧へ">← talks</a>
+  <button type="button" id="prev" aria-label="前のスライド">‹</button>
+  <span id="count">1 / 1</span>
+  <button type="button" id="next" aria-label="次のスライド">›</button>
+  <span class="bar"><i id="bar"></i></span>
+  <span>← → / Space</span>
+</nav>
+
+<script>
+const stage = document.getElementById('stage');
+const slides = [...stage.querySelectorAll('.slide')];
+const count = document.getElementById('count');
+const bar = document.getElementById('bar');
+let i = 0;
+
+function fit(){
+  const s = Math.min(innerWidth / 1280, (innerHeight - 44) / 720);
+  stage.style.transform = `scale(${s})`;
+}
+function show(n, push = true){
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((el, k) => el.classList.toggle('on', k === i));
+  count.textContent = `${i + 1} / ${slides.length}`;
+  bar.style.width = `${(i / (slides.length - 1)) * 100}%`;
+  document.title = `${slides[i].dataset.title} — あれをモーダルと呼ぶな`;
+  if (push) history.replaceState(null, '', `#${i + 1}`);
+}
+function fromHash(){
+  const n = parseInt(location.hash.slice(1), 10);
+  show(Number.isFinite(n) ? n - 1 : 0, false);
+}
+
+addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) {
+    if (e.key === 'Enter' && e.target.closest('a,button')) return;
+    e.preventDefault(); show(i + (e.shiftKey && e.key === ' ' ? -1 : 1));
+  } else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) {
+    e.preventDefault(); show(i - 1);
+  } else if (e.key === 'Home') show(0);
+  else if (e.key === 'End') show(slides.length - 1);
+});
+stage.addEventListener('click', e => {
+  if (e.target.closest('a')) return;
+  const r = stage.getBoundingClientRect();
+  show(i + (e.clientX < r.left + r.width / 3 ? -1 : 1));
+});
+let tx = null;
+addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, {passive: true});
+addEventListener('touchend', e => {
+  if (tx === null) return;
+  const dx = e.changedTouches[0].clientX - tx; tx = null;
+  if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1));
+});
+document.getElementById('prev').onclick = () => show(i - 1);
+document.getElementById('next').onclick = () => show(i + 1);
+addEventListener('resize', fit);
+addEventListener('hashchange', fromHash);
+fit(); fromHash();
+</script>
+</body>
+</html>

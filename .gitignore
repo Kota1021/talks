@@ -1,4 +1,4 @@
-# このリポジトリが追跡するのは、公開する HTML のみ。
+# このリポジトリが追跡するのは、公開する HTML と、それが参照する画像のみ。
 # 既定で全て無視し、追跡するものを下に列挙する。
 *
 !.gitignore
@@ -8,3 +8,8 @@
 cursed-cafe-api/*
 !cursed-cafe-api/index.html
 !cursed-cafe-api/static.html
+!dont-call-it-modal/
+dont-call-it-modal/*
+!dont-call-it-modal/index.html
+!dont-call-it-modal/img/
+!dont-call-it-modal/img/*.jpg
